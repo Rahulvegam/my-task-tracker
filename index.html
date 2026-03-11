@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Task Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════ ADD / EDIT TASK MODAL ══════════════ -->
+<div id="task-overlay" class="overlay hidden" onclick="overlayClickClose(event,'task-overlay')">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-title">Add New Task</h2>
+        <p id="modal-sub" class="modal-sub">Fill in the details from your Redmine tracker</p>
+      </div>
+      <button class="icon-btn" onclick="closeTaskModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+
+        <div class="form-row-full">
+          <label>Tracker ID <span class="req">*</span>
+            <input id="f-id" type="number" placeholder="e.g. 4821" min="1"/>
+          </label>
+        </div>
+
+        <div class="form-row-full">
+          <label>Subject / Title <span class="req">*</span>
+            <input id="f-subject" type="text" placeholder="What is this task about?"/>
+          </label>
+        </div>
+
+        <label>Status <span class="req">*</span>
+          <select id="f-status">
+            <option value="">— Select —</option>
+            <option>New</option>
+            <option>In Progress</option>
+            <option>Feedback</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+            <option>Rejected</option>
+          </select>
+        </label>
+
+        <label>Priority
+          <select id="f-priority">
+            <option value="">— Select —</option>
+            <option>Low</option>
+            <option>Normal</option>
+            <option>High</option>
+            <option>Urgent</option>
+            <option>Immediate</option>
+          </select>
+        </label>
+
+        <label>Project / Product
+          <input id="f-project" type="text" placeholder="e.g. Portal v3"/>
+        </label>
+
+        <label>Tracker Type
+          <input id="f-tracker-type" type="text" placeholder="e.g. Bug, Feature, Support"/>
+        </label>
+
+        <label>Assigned To
+          <input id="f-assigned" type="text" placeholder="Your name"/>
+        </label>
+
+        <label>Author / Reporter
+          <input id="f-author" type="text" placeholder="Who raised this?"/>
+        </label>
+
+        <label>Start Date
+          <input id="f-start" type="date"/>
+        </label>
+
+        <label>Due Date
+          <input id="f-due" type="date"/>
+        </label>
+
+        <label>Done %
+          <input id="f-done" type="number" min="0" max="100" placeholder="0 – 100"/>
+        </label>
+
+        <label>Version / Sprint
+          <input id="f-version" type="text" placeholder="e.g. v2.4.1"/>
+        </label>
+
+        <label>Parent Tracker ID
+          <input id="f-parent" type="number" placeholder="e.g. 4800" min="1"/>
+        </label>
+
+        <label>Child Tracker IDs
+          <input id="f-children" type="text" placeholder="Comma separated: 4822, 4823"/>
+        </label>
+
+        <label>Related Tracker IDs
+          <input id="f-relations" type="text" placeholder="Comma separated: 4900, 4901"/>
+        </label>
+
+        <label>Category
+          <input id="f-category" type="text" placeholder="e.g. UI, Backend, Auth"/>
+        </label>
+
+        <div class="form-row-full">
+          <label>Description
+            <textarea id="f-desc" rows="3" placeholder="Brief description of the task…"></textarea>
+          </label>
+        </div>
+
+        <div class="form-row-full">
+          <label>My Notes
+            <textarea id="f-note" rows="4" placeholder="Post-demo notes, observations, anything personal…"></textarea>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveTask()">Save Task</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DELETE CONFIRM MODAL ══════════════ -->
+<div id="delete-overlay" class="overlay hidden" onclick="overlayClickClose(event,'delete-overlay')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2>Remove Task</h2>
+      <button class="icon-btn" onclick="closeDelete()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-2);font-size:14px;margin-bottom:20px">
+        Are you sure you want to remove tracker <strong id="delete-id-label"></strong> from your list?
+        <br><span style="font-size:12px;color:var(--text-4)">This only removes it from the app. Nothing changes in Redmine.</span>
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeDelete()">Cancel</button>
+        <button class="btn-danger" onclick="confirmDelete()">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ APP SHELL ══════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">T</div>
+      <div>
+        <div class="brand-title">Task Tracker</div>
+        <div class="brand-sub">Redmine Personal Log</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <button class="btn-add-task" onclick="openAddModal()">
+        <span>+</span> Add New Task
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Filter by Status</div>
+      <div class="filter-pills" id="filter-pills">
+        <button class="pill active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="pill" data-filter="New" onclick="setFilter('New',this)">New</button>
+        <button class="pill" data-filter="In Progress" onclick="setFilter('In Progress',this)">In Progress</button>
+        <button class="pill" data-filter="Feedback" onclick="setFilter('Feedback',this)">Feedback</button>
+        <button class="pill" data-filter="Resolved" onclick="setFilter('Resolved',this)">Resolved</button>
+        <button class="pill" data-filter="Closed" onclick="setFilter('Closed',this)">Closed</button>
+        <button class="pill" data-filter="Rejected" onclick="setFilter('Rejected',this)">Rejected</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Sort by</div>
+      <select id="sort-select" onchange="setSort(this.value)" class="sort-select">
+        <option value="added_desc">Recently Added</option>
+        <option value="added_asc">Oldest First</option>
+        <option value="id_asc">Tracker ID ↑</option>
+        <option value="id_desc">Tracker ID ↓</option>
+        <option value="due_asc">Due Date ↑</option>
+        <option value="status">Status</option>
+        <option value="priority">Priority</option>
+      </select>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Actions</div>
+      <button class="sidebar-btn" onclick="exportExcel()">
+        <span class="sidebar-btn-icon">⬇</span> Export to Excel
+      </button>
+      <button class="sidebar-btn" onclick="importExcel()">
+        <span class="sidebar-btn-icon">⬆</span> Import from Excel
+        <input type="file" id="import-input" accept=".xlsx" style="display:none" onchange="handleImport(event)"/>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Summary</div>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-item"><div class="stat-num" id="s-open">0</div><div class="stat-lbl">Open</div></div>
+        <div class="stat-item"><div class="stat-num" id="s-progress">0</div><div class="stat-lbl">In Progress</div></div>
+        <div class="stat-item"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Done</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+    <div class="main-topbar">
+      <div>
+        <h1 class="main-title">My Assigned Tasks</h1>
+        <div class="main-sub" id="main-sub-text">Track your Redmine tasks with personal notes</div>
+      </div>
+      <div class="topbar-search">
+        <input id="search-input" type="text" placeholder="🔍  Search by ID, title, project…" oninput="renderCards()"/>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">No tasks yet</div>
+      <div class="empty-sub">Click <strong>+ Add New Task</strong> in the sidebar to start tracking your Redmine assignments.</div>
+    </div>
+
+    <!-- CARDS GRID -->
+    <div id="cards-container"></div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
