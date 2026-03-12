@@ -1,281 +1,415 @@
-/* ══════════════════════════════════════════════════
-   MY TASK TRACKER  ·  app.js
-   ══════════════════════════════════════════════════ */
+/* MY TASK TRACKER - app.js - v4 */
 
-const SEED_DATA = [{"id": "19cde2263484a15", "client": "BASF", "trackerId": 68898, "trackerType": "Bug", "module": "", "plant": "", "subject": "Loading Issue in Truck Management screen", "status": "Released to Production", "note": "", "priority": "", "project": "BASF", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348b212", "client": "BASF", "trackerId": 17343, "trackerType": "CR", "module": "", "plant": "", "subject": "Handling PO Visibility in SFS Based on Delivery Order Creation in SAP ( RFG)", "status": "New", "note": "", "priority": "", "project": "BASF", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263483f2f", "client": "Henkel", "trackerId": 68925, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Issue during stock movement to dispatch gate", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348942e", "client": "Henkel", "trackerId": 67960, "trackerType": "CR", "module": "Goods Receipt", "plant": "", "subject": "Itapevi GR Workflow changes", "status": "Local testing Completed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Goods Receipt", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348656b", "client": "Henkel", "trackerId": 67124, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Dispatch shuttle process enhancement with Spanish translations", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348d08b", "client": "Henkel", "trackerId": 69974, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Delivery order unit issue in Stock transfer flow", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263481e2a", "client": "Henkel", "trackerId": 70044, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Dispatch go-live issue fix", "status": "Released to 203", "note": "Awaiting confirmation from client", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde22634828ce", "client": "Henkel", "trackerId": 68278, "trackerType": "CR", "module": "Dispatch", "plant": "", "subject": "New enhancement to dispatch shuttle process", "status": "Closed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348f70", "client": "Henkel", "trackerId": 80449, "trackerType": "CR", "module": "Manufacture", "plant": "Kunpeng", "subject": "Enable Re-Creation of Failed Staging Order via Mobile \u201cRequest Replenish\u201d", "status": "New", "note": "when staging order for issue addition and request replenishment is failed, user can click request replenish on mobile, system can pop up message and re create instead of creating on staging order web page", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348dcf7", "client": "Henkel", "trackerId": 80393, "trackerType": "CR", "module": "Manufacture", "plant": "Rancho", "subject": "Display Gross & Tare Weight with Pallet Label Information", "status": "Waiting for PO", "note": "SOW sent ", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263488a9f", "client": "Henkel", "trackerId": 80399, "trackerType": "CR", "module": "Manufacture", "plant": "WGQ", "subject": "Implementation of Weighing Scale Feature for Gross Weight Capture During Bulk FG Confirmation", "status": "PO received - assigned to developer ( Narendra)", "note": "SOW sent ", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263481ce3", "client": "Henkel", "trackerId": 78023, "trackerType": "CR", "module": "Manufacture", "plant": "Rancho", "subject": "Enhancement to Capture Manual Tare Weight During Bulk FG Confirmation", "status": "New - rework on design ( savita ma'am comments)", "note": "Design shared - effort 04", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348e6a7", "client": "Henkel", "trackerId": 79173, "trackerType": "CR", "module": "Staging", "plant": "Kunpeng", "subject": "Send an email notification in case of failure in staging order creation or pallet transfer", "status": "New - Design phase", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263484ee9", "client": "Henkel", "trackerId": 79174, "trackerType": "CR", "module": "Manufacture", "plant": "Kunpeng", "subject": "DG dashboard enhancements", "status": "New - Design phase", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348d484", "client": "Henkel", "trackerId": 81245, "trackerType": "CR", "module": "Staging", "plant": "Kunpeng", "subject": "Send process order number to swisslog when request replenishment", "status": "Need inputs from chythra ma'am ", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348ed52", "client": "Henkel", "trackerId": 81237, "trackerType": "Bug", "module": "Staging", "plant": "Kunpeng", "subject": "process order log has no reservation log", "status": "New", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348b5bb", "client": "Henkel", "trackerId": 62821, "trackerType": "CR", "module": "Manufacture", "plant": "All", "subject": "Batch Tracebility ", "status": "Competed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348f11c", "client": "WorkItem", "trackerId": 71122, "trackerType": "WorkItem", "module": "", "plant": "", "subject": "Refinished goods dispatch - approach and Document", "status": "Document sent to customer and received the approval.", "note": "", "priority": "", "project": "WorkItem", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}];
+const SEED_DATA = [{"id": "19cde2263484a15", "client": "BASF", "trackerId": 68898, "trackerType": "Bug", "module": "", "plant": "", "subject": "Loading Issue in Truck Management screen", "status": "Released to Production", "note": "", "priority": "", "project": "BASF", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348b212", "client": "BASF", "trackerId": 17343, "trackerType": "CR", "module": "", "plant": "", "subject": "Handling PO Visibility in SFS Based on Delivery Order Creation in SAP ( RFG)", "status": "New", "note": "", "priority": "", "project": "BASF", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263483f2f", "client": "Henkel", "trackerId": 68925, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Issue during stock movement to dispatch gate", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348942e", "client": "Henkel", "trackerId": 67960, "trackerType": "CR", "module": "Goods Receipt", "plant": "", "subject": "Itapevi GR Workflow changes", "status": "Local testing Completed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Goods Receipt", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348656b", "client": "Henkel", "trackerId": 67124, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Dispatch shuttle process enhancement with Spanish translations", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348d08b", "client": "Henkel", "trackerId": 69974, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Delivery order unit issue in Stock transfer flow", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263481e2a", "client": "Henkel", "trackerId": 70044, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Dispatch go-live issue fix", "status": "Released to 203", "note": "Awaiting confirmation from client", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde22634828ce", "client": "Henkel", "trackerId": 68278, "trackerType": "CR", "module": "Dispatch", "plant": "", "subject": "New enhancement to dispatch shuttle process", "status": "Closed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348f70", "client": "Henkel", "trackerId": 80449, "trackerType": "CR", "module": "Manufacture", "plant": "Kunpeng", "subject": "Enable Re-Creation of Failed Staging Order via Mobile \u201cRequest Replenish\u201d", "status": "New", "note": "when staging order for issue addition and request replenishment is failed, user can click request replenish on mobile, system can pop up message and re create instead of creating on staging order web page", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348dcf7", "client": "Henkel", "trackerId": 80393, "trackerType": "CR", "module": "Manufacture", "plant": "Rancho", "subject": "Display Gross & Tare Weight with Pallet Label Information", "status": "Waiting for PO", "note": "SOW sent ", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263488a9f", "client": "Henkel", "trackerId": 80399, "trackerType": "CR", "module": "Manufacture", "plant": "WGQ", "subject": "Implementation of Weighing Scale Feature for Gross Weight Capture During Bulk FG Confirmation", "status": "PO received - assigned to developer ( Narendra)", "note": "SOW sent ", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263481ce3", "client": "Henkel", "trackerId": 78023, "trackerType": "CR", "module": "Manufacture", "plant": "Rancho", "subject": "Enhancement to Capture Manual Tare Weight During Bulk FG Confirmation", "status": "New - rework on design ( savita ma'am comments)", "note": "Design shared - effort 04", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348e6a7", "client": "Henkel", "trackerId": 79173, "trackerType": "CR", "module": "Staging", "plant": "Kunpeng", "subject": "\tSend an email notification in case of failure in staging order creation or pallet transfer", "status": "New - Design phase", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263484ee9", "client": "Henkel", "trackerId": 79174, "trackerType": "CR", "module": "Manufacture", "plant": "Kunpeng", "subject": "DG dashboard enhancements", "status": "New - Design phase", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348d484", "client": "Henkel", "trackerId": 81245, "trackerType": "CR", "module": "Staging", "plant": "Kunpeng", "subject": "Send process order number to swisslog when request replenishment", "status": "Need inputs from chythra ma'am ", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348ed52", "client": "Henkel", "trackerId": 81237, "trackerType": "Bug", "module": "Staging", "plant": "Kunpeng", "subject": "process order log has no reservation log", "status": "New", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348b5bb", "client": "Henkel", "trackerId": 62821, "trackerType": "CR", "module": "Manufacture", "plant": "All", "subject": "Batch Tracebility ", "status": "Competed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348f11c", "client": "WorkItem", "trackerId": 71122, "trackerType": "WorkItem", "module": "", "plant": "", "subject": "Refinished goods dispatch - approach and Document", "status": "Document sent to customer and received the approval.", "note": "", "priority": "", "project": "WorkItem", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}];
 
-let STATE = { tasks: [], client: "all", filter: "all", type: "all", sort: "added_desc" };
-let _editingId = null, _deleteId = null;
+var appState = {
+  tasks: [],
+  clientFilter: "all",
+  statusFilter: "all",
+  typeFilter:   "all",
+  sortBy:       "added_desc",
+  activeTab:    "active"
+};
+var editingTaskId  = null;
+var deletingTaskId = null;
 
-function persist() { localStorage.setItem("rtt_tasks_v2", JSON.stringify(STATE.tasks)); }
-function loadFromStorage() {
-  try { const raw = localStorage.getItem("rtt_tasks_v2"); if (raw) { STATE.tasks = JSON.parse(raw); return; } } catch(_) {}
-  STATE.tasks = SEED_DATA.map(t => ({ ...t })); persist();
+/* ── STORAGE ── */
+function save() { localStorage.setItem("rtt_v4", JSON.stringify(appState.tasks)); }
+function load() {
+  try { var r = localStorage.getItem("rtt_v4"); if (r) { appState.tasks = JSON.parse(r); return; } } catch(e) {}
+  appState.tasks = SEED_DATA.map(function(t) { return Object.assign({}, t); });
+  save();
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-function statusGroup(status) {
-  const s = (status || "").toLowerCase();
-  if (s.includes("new") || s === "") return "new";
-  if (s.includes("progress") || s.includes("design") || s.includes("testing") || s.includes("waiting") || s.includes("po received") || s.includes("assigned") || s.includes("inputs")) return "active";
-  if (s.includes("released") || s.includes("production") || s.includes("competed") || s.includes("completed") || s.includes("approval") || s.includes("closed")) return "released";
-  if (s.includes("reject") || s.includes("cancel")) return "closed";
+/* ── STATUS GROUP ── */
+function statusGroup(s) {
+  s = (s || "").toLowerCase();
+  if (s.indexOf("new") >= 0 || s === "") return "new";
+  if (s.indexOf("progress") >= 0 || s.indexOf("design") >= 0 || s.indexOf("testing") >= 0 ||
+      s.indexOf("waiting") >= 0 || s.indexOf("po received") >= 0 || s.indexOf("assigned") >= 0 ||
+      s.indexOf("inputs") >= 0) return "active";
+  if (s.indexOf("released") >= 0 || s.indexOf("production") >= 0 || s.indexOf("competed") >= 0 ||
+      s.indexOf("completed") >= 0 || s.indexOf("approval") >= 0 || s.indexOf("closed") >= 0) return "released";
+  if (s.indexOf("reject") >= 0 || s.indexOf("cancel") >= 0) return "closed";
   return "active";
 }
 
-const CLIENT_COLORS = {
-  BASF:     { bg:"#eff6ff", border:"#2563eb", text:"#1d4ed8" },
-  Henkel:   { bg:"#fef3c7", border:"#d97706", text:"#92400e" },
-  WorkItem: { bg:"#f0fdf4", border:"#059669", text:"#065f46" },
-  Other:    { bg:"#f5f3ff", border:"#7c3aed", text:"#5b21b6" },
-};
-function clientColor(client) { return CLIENT_COLORS[client] || CLIENT_COLORS.Other; }
-function typeBadgeStyle(type) {
-  if (type === "Bug")      return "background:#fef2f2;color:#dc2626;border:1px solid #fecaca";
-  if (type === "CR")       return "background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe";
-  if (type === "WorkItem") return "background:#f0fdf4;color:#059669;border:1px solid #a7f3d0";
-  return "background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe";
+/* ── HTML ESCAPE ── */
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ── DATES ── */
+function fmtDate(d) { if(!d)return""; try{return new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});}catch(e){return d;} }
+function fmtDT(d)   { if(!d)return""; try{return new Date(d).toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}catch(e){return d;} }
+
+/* ── BADGE STYLES ── */
+function typeBadgeClass(type) {
+  if (type==="Bug")      return "badge bug";
+  if (type==="CR")       return "badge cr";
+  if (type==="WorkItem") return "badge workitem";
+  return "badge other";
+}
+function clientBadgeClass(c) {
+  if (c==="BASF")     return "client-badge basf";
+  if (c==="Henkel")   return "client-badge henkel";
+  if (c==="WorkItem") return "client-badge workitem";
+  return "client-badge basf";
+}
+function cardClass(c) {
+  if (c==="BASF")     return "task-card basf";
+  if (c==="Henkel")   return "task-card henkel";
+  if (c==="WorkItem") return "task-card workitem";
+  return "task-card";
 }
 
+/* ── MODAL ── */
 function openAddModal() {
-  _editingId = null; clearForm();
+  editingTaskId = null; clearForm();
   document.getElementById("modal-title").textContent = "Add New Task";
   document.getElementById("modal-sub").textContent   = "Fill in the details from your Redmine tracker";
   document.getElementById("task-overlay").classList.remove("hidden");
   document.getElementById("f-id").focus();
 }
 function openEditModal(id) {
-  const task = STATE.tasks.find(t => t.id === id); if (!task) return;
-  _editingId = id; fillForm(task);
-  document.getElementById("modal-title").textContent = `Edit #${task.trackerId}`;
+  var task = findTask(id); if (!task) return;
+  editingTaskId = id; fillForm(task);
+  document.getElementById("modal-title").textContent = "Edit #" + task.trackerId;
   document.getElementById("modal-sub").textContent   = task.subject;
   document.getElementById("task-overlay").classList.remove("hidden");
 }
-function closeTaskModal() { document.getElementById("task-overlay").classList.add("hidden"); _editingId = null; }
+function closeTaskModal() { document.getElementById("task-overlay").classList.add("hidden"); editingTaskId = null; }
 
 function clearForm() {
-  ["f-id","f-subject","f-module","f-plant","f-status","f-assigned","f-author","f-start","f-due","f-done","f-version","f-parent","f-children","f-note"]
-    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+  ["f-id","f-subject","f-module","f-plant","f-status","f-assigned","f-author",
+   "f-start","f-due","f-done","f-version","f-parent","f-children","f-note"].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = "";
+  });
   document.getElementById("f-client").value = "";
   document.getElementById("f-tracker-type").value = "";
   document.getElementById("f-priority").value = "";
 }
 function fillForm(t) {
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
-  set("f-id", t.trackerId); set("f-subject", t.subject); set("f-status", t.status);
-  set("f-module", t.module); set("f-plant", t.plant); set("f-assigned", t.assignedTo);
-  set("f-author", t.author); set("f-start", t.startDate); set("f-due", t.dueDate);
-  set("f-done", t.donePct != null ? t.donePct : ""); set("f-version", t.version);
-  set("f-parent", t.parentId); set("f-children", t.childIds); set("f-note", t.note);
-  document.getElementById("f-client").value = t.client || "";
-  document.getElementById("f-tracker-type").value = t.trackerType || "";
-  document.getElementById("f-priority").value = t.priority || "";
+  function sv(id,v){ var el=document.getElementById(id); if(el) el.value=v||""; }
+  sv("f-id",t.trackerId); sv("f-subject",t.subject); sv("f-status",t.status);
+  sv("f-module",t.module); sv("f-plant",t.plant); sv("f-assigned",t.assignedTo);
+  sv("f-author",t.author); sv("f-start",t.startDate); sv("f-due",t.dueDate);
+  sv("f-done",t.donePct!=null?t.donePct:""); sv("f-version",t.version);
+  sv("f-parent",t.parentId); sv("f-children",t.childIds); sv("f-note",t.note);
+  document.getElementById("f-client").value = t.client||"";
+  document.getElementById("f-tracker-type").value = t.trackerType||"";
+  document.getElementById("f-priority").value = t.priority||"";
 }
+function findTask(id) { for(var i=0;i<appState.tasks.length;i++){if(appState.tasks[i].id===id)return appState.tasks[i];} return null; }
 
 function saveTask() {
-  const trackerId = parseInt(document.getElementById("f-id").value.trim(), 10);
-  const subject   = document.getElementById("f-subject").value.trim();
-  const status    = document.getElementById("f-status").value.trim();
-  const client    = document.getElementById("f-client").value;
-  if (!trackerId || isNaN(trackerId)) { toast("Please enter a valid Tracker ID.", "error"); return; }
-  if (!subject) { toast("Subject is required.", "error"); return; }
-  if (!status)  { toast("Please enter a Status.", "error"); return; }
-  if (!client)  { toast("Please select a Client.", "error"); return; }
-  if (!_editingId && STATE.tasks.find(t => String(t.trackerId) === String(trackerId))) { toast(`Tracker #${trackerId} already exists.`, "error"); return; }
-  const taskData = {
-    trackerId, subject, status, client,
-    trackerType: document.getElementById("f-tracker-type").value,
-    module:   document.getElementById("f-module").value.trim(),
-    plant:    document.getElementById("f-plant").value.trim(),
-    priority: document.getElementById("f-priority").value,
-    assignedTo: document.getElementById("f-assigned").value.trim(),
-    author:   document.getElementById("f-author").value.trim(),
-    startDate: document.getElementById("f-start").value,
-    dueDate:  document.getElementById("f-due").value,
-    donePct:  document.getElementById("f-done").value !== "" ? parseInt(document.getElementById("f-done").value, 10) : null,
-    version:  document.getElementById("f-version").value.trim(),
-    parentId: document.getElementById("f-parent").value.trim(),
-    childIds: document.getElementById("f-children").value.trim(),
-    note:     document.getElementById("f-note").value.trim(),
-    project:  client,
-  };
-  if (_editingId) {
-    const idx = STATE.tasks.findIndex(t => t.id === _editingId);
-    if (idx !== -1) STATE.tasks[idx] = { ...STATE.tasks[idx], ...taskData, updatedAt: new Date().toISOString() };
-    toast("Task updated ✓", "success");
-  } else {
-    STATE.tasks.unshift({ id: uid(), ...taskData, addedAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
-    toast(`Task #${trackerId} added ✓`, "success");
+  var tid  = parseInt(document.getElementById("f-id").value.trim(),10);
+  var subj = document.getElementById("f-subject").value.trim();
+  var stat = document.getElementById("f-status").value.trim();
+  var cli  = document.getElementById("f-client").value;
+  if (!tid||isNaN(tid))  { toast("Please enter a valid Tracker ID.","error"); return; }
+  if (!subj)             { toast("Subject is required.","error"); return; }
+  if (!stat)             { toast("Please enter a Status.","error"); return; }
+  if (!cli)              { toast("Please select a Client.","error"); return; }
+  if (!editingTaskId) {
+    for(var ci=0;ci<appState.tasks.length;ci++){
+      if(String(appState.tasks[ci].trackerId)===String(tid)){ toast("Tracker #"+tid+" already exists.","error"); return; }
+    }
   }
-  persist(); closeTaskModal(); renderCards(); updateSidebar();
+  var dp = document.getElementById("f-done").value;
+  var data = {
+    trackerId:tid, subject:subj, status:stat, client:cli,
+    trackerType:document.getElementById("f-tracker-type").value,
+    module:document.getElementById("f-module").value.trim(),
+    plant:document.getElementById("f-plant").value.trim(),
+    priority:document.getElementById("f-priority").value,
+    assignedTo:document.getElementById("f-assigned").value.trim(),
+    author:document.getElementById("f-author").value.trim(),
+    startDate:document.getElementById("f-start").value,
+    dueDate:document.getElementById("f-due").value,
+    donePct:dp!==""?parseInt(dp,10):null,
+    version:document.getElementById("f-version").value.trim(),
+    parentId:document.getElementById("f-parent").value.trim(),
+    childIds:document.getElementById("f-children").value.trim(),
+    note:document.getElementById("f-note").value.trim(),
+    project:cli
+  };
+  if (editingTaskId) {
+    for(var ei=0;ei<appState.tasks.length;ei++){
+      if(appState.tasks[ei].id===editingTaskId){
+        appState.tasks[ei]=Object.assign({},appState.tasks[ei],data,{updatedAt:new Date().toISOString()}); break;
+      }
+    }
+    toast("Task updated ✓","success");
+  } else {
+    data.id=uid(); data.addedAt=new Date().toISOString(); data.updatedAt=data.addedAt; data.hidden=false;
+    appState.tasks.unshift(data);
+    toast("Task #"+tid+" added ✓","success");
+  }
+  save(); closeTaskModal(); renderCards(); updateStats();
 }
 
+/* ── DELETE ── */
 function askDelete(id) {
-  _deleteId = id;
-  const t = STATE.tasks.find(x => x.id === id);
-  document.getElementById("delete-id-label").textContent = t ? `#${t.trackerId} — ${t.subject}` : `#${id}`;
+  deletingTaskId = id;
+  var t = findTask(id);
+  document.getElementById("delete-id-label").textContent = t ? "#"+t.trackerId+" — "+t.subject : "#"+id;
   document.getElementById("delete-overlay").classList.remove("hidden");
 }
-function closeDelete() { document.getElementById("delete-overlay").classList.add("hidden"); _deleteId = null; }
-function confirmDelete() { STATE.tasks = STATE.tasks.filter(t => t.id !== _deleteId); persist(); closeDelete(); renderCards(); updateSidebar(); toast("Task removed.", ""); }
-
-function setClient(val, btn) { STATE.client = val; document.querySelectorAll("#client-pills .pill").forEach(p => p.classList.remove("active")); btn.classList.add("active"); renderCards(); }
-function setFilter(val, btn) { STATE.filter = val; document.querySelectorAll("#status-pills .pill").forEach(p => p.classList.remove("active")); btn.classList.add("active"); renderCards(); }
-function setType(val, btn)   { STATE.type   = val; document.querySelectorAll("#type-pills .pill").forEach(p => p.classList.remove("active")); btn.classList.add("active"); renderCards(); }
-function setSort(val) { STATE.sort = val; renderCards(); }
-
-function filteredSorted() {
-  let list = [...STATE.tasks];
-  const q = (document.getElementById("search-input")?.value || "").toLowerCase().trim();
-  if (q) list = list.filter(t => String(t.trackerId).includes(q) || (t.subject||"").toLowerCase().includes(q) || (t.client||"").toLowerCase().includes(q) || (t.module||"").toLowerCase().includes(q) || (t.plant||"").toLowerCase().includes(q) || (t.status||"").toLowerCase().includes(q) || (t.trackerType||"").toLowerCase().includes(q) || (t.note||"").toLowerCase().includes(q));
-  if (STATE.client !== "all") list = list.filter(t => t.client === STATE.client);
-  if (STATE.filter !== "all") list = list.filter(t => statusGroup(t.status) === STATE.filter);
-  if (STATE.type   !== "all") list = list.filter(t => t.trackerType === STATE.type);
-  switch (STATE.sort) {
-    case "added_desc": list.sort((a,b) => new Date(b.addedAt)-new Date(a.addedAt)); break;
-    case "added_asc":  list.sort((a,b) => new Date(a.addedAt)-new Date(b.addedAt)); break;
-    case "id_asc":     list.sort((a,b) => a.trackerId-b.trackerId); break;
-    case "id_desc":    list.sort((a,b) => b.trackerId-a.trackerId); break;
-    case "client":     list.sort((a,b) => (a.client||"").localeCompare(b.client||"")); break;
-  }
-  return list;
+function closeDeleteModal() { document.getElementById("delete-overlay").classList.add("hidden"); deletingTaskId=null; }
+function confirmDelete() {
+  var nl=[]; for(var i=0;i<appState.tasks.length;i++){if(appState.tasks[i].id!==deletingTaskId)nl.push(appState.tasks[i]);}
+  appState.tasks=nl; save(); closeDeleteModal(); renderCards(); updateStats();
+  toast("Task removed.","");
 }
 
+/* ── HIDE / UNHIDE ── */
+function hideTask(id) {
+  var t = findTask(id); if (!t) return;
+  t.hidden = true; save(); renderCards(); updateStats();
+  toast("Task hidden. Find it in the Hidden tab.","");
+}
+function unhideTask(id) {
+  var t = findTask(id); if (!t) return;
+  t.hidden = false; save(); renderCards(); updateStats();
+  toast("Task restored to Active.","success");
+}
+
+/* ── TABS ── */
+function switchTab(tab, btn) {
+  appState.activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  renderCards();
+}
+
+/* ── FILTERS ── */
+function setClient(val,btn){ appState.clientFilter=val; activePill("#client-pills",btn); renderCards(); }
+function setFilter(val,btn){ appState.statusFilter=val; activePill("#status-pills",btn); renderCards(); }
+function setType(val,btn)  { appState.typeFilter=val;   activePill("#type-pills",btn);   renderCards(); }
+function setSort(val)      { appState.sortBy=val; renderCards(); }
+function activePill(sel,btn){ document.querySelectorAll(sel+" .pill").forEach(function(p){p.classList.remove("active");}); btn.classList.add("active"); }
+
+/* ── FILTER + SORT ── */
+function getList() {
+  var isHidden = appState.activeTab === "hidden";
+  var result = appState.tasks.filter(function(t){ return isHidden ? t.hidden===true : !t.hidden; });
+
+  var q = (document.getElementById("search-input")||{}).value;
+  q = (q||"").toLowerCase().trim();
+  if (q) {
+    result = result.filter(function(t){
+      return String(t.trackerId).indexOf(q)>=0 || (t.subject||"").toLowerCase().indexOf(q)>=0 ||
+             (t.client||"").toLowerCase().indexOf(q)>=0 || (t.module||"").toLowerCase().indexOf(q)>=0 ||
+             (t.plant||"").toLowerCase().indexOf(q)>=0  || (t.status||"").toLowerCase().indexOf(q)>=0 ||
+             (t.trackerType||"").toLowerCase().indexOf(q)>=0 || (t.note||"").toLowerCase().indexOf(q)>=0;
+    });
+  }
+  if (appState.clientFilter!=="all") result=result.filter(function(t){return t.client===appState.clientFilter;});
+  if (appState.statusFilter!=="all") result=result.filter(function(t){return statusGroup(t.status)===appState.statusFilter;});
+  if (appState.typeFilter!=="all")   result=result.filter(function(t){return t.trackerType===appState.typeFilter;});
+
+  result.sort(function(a,b){
+    if (appState.sortBy==="added_asc") return new Date(a.addedAt)-new Date(b.addedAt);
+    if (appState.sortBy==="id_asc")    return a.trackerId-b.trackerId;
+    if (appState.sortBy==="id_desc")   return b.trackerId-a.trackerId;
+    if (appState.sortBy==="client")    return (a.client||"").localeCompare(b.client||"");
+    return new Date(b.addedAt)-new Date(a.addedAt);
+  });
+  return result;
+}
+
+/* ── RENDER ── */
 function renderCards() {
-  const container = document.getElementById("cards-container");
-  const emptyEl   = document.getElementById("empty-state");
-  const list      = filteredSorted();
-  if (list.length === 0) { emptyEl.classList.remove("hidden"); container.innerHTML = ""; }
-  else { emptyEl.classList.add("hidden"); container.innerHTML = list.map(buildCard).join(""); }
-  updateMainSub(list.length);
+  var container = document.getElementById("cards-container");
+  var emptyEl   = document.getElementById("empty-state");
+  var list      = getList();
+
+  /* update tab counts */
+  var activeCount = appState.tasks.filter(function(t){return !t.hidden;}).length;
+  var hiddenCount = appState.tasks.filter(function(t){return t.hidden===true;}).length;
+  document.getElementById("tab-active-count").textContent = activeCount;
+  document.getElementById("tab-hidden-count").textContent = hiddenCount;
+
+  if (list.length===0) {
+    emptyEl.classList.remove("hidden"); container.innerHTML="";
+  } else {
+    emptyEl.classList.add("hidden");
+    var html="";
+    if (appState.activeTab==="hidden") {
+      html+='<div class="hidden-banner">👁 These tasks are hidden from your main view. Click <strong>Unhide</strong> to restore them.</div>';
+    }
+    for(var i=0;i<list.length;i++) html+=buildCard(list[i]);
+    container.innerHTML=html;
+  }
+
+  var subEl=document.getElementById("main-sub");
+  if(subEl) subEl.textContent="Showing "+list.length+" of "+appState.tasks.length+" task"+(appState.tasks.length!==1?"s":"");
 }
 
 function buildCard(task) {
-  const cc  = clientColor(task.client);
-  const grp = statusGroup(task.status);
-  const dotColors = { new:"#3b82f6", active:"#f59e0b", released:"#10b981", closed:"#6b7280" };
-  const dotColor  = dotColors[grp] || "#94a3b8";
-  const doneHTML  = task.donePct != null ? `<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-4);margin-bottom:3px"><span>Done</span><span>${task.donePct}%</span></div><div style="background:var(--border);border-radius:99px;height:5px;overflow:hidden"><div style="width:${task.donePct}%;height:100%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:99px"></div></div></div>` : "";
-  let relHTML = "";
-  if (task.parentId || task.childIds) {
-    relHTML = `<div style="margin-bottom:10px">`;
-    if (task.parentId) relHTML += `<span style="font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;margin-right:5px;color:var(--text-3)">⬆ Parent: <strong>#${esc(task.parentId)}</strong></span>`;
-    if (task.childIds) task.childIds.split(",").map(s=>s.trim()).filter(Boolean).forEach(c => { relHTML += `<span style="font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;margin-right:5px;color:var(--text-3)">⬇ Child: <strong>#${esc(c)}</strong></span>`; });
-    relHTML += `</div>`;
+  var grp = statusGroup(task.status);
+  var typeB = task.trackerType ? '<span class="'+typeBadgeClass(task.trackerType)+'">'+esc(task.trackerType)+'</span>' : "";
+  var cliB  = '<span class="'+clientBadgeClass(task.client)+'">'+esc(task.client||"")+'</span>';
+  var modB  = task.module  ? '<span class="card-meta-tag">&#x1F4E6; '+esc(task.module)+'</span>' : "";
+  var pltB  = task.plant   ? '<span class="card-meta-tag">&#x1F3ED; '+esc(task.plant)+'</span>'  : "";
+  var dueB  = task.dueDate ? '<span class="card-meta-tag" style="font-family:var(--mono);font-size:11px">&#x1F4C5; '+fmtDate(task.dueDate)+'</span>' : "";
+
+  /* action buttons */
+  var hideBtn = task.hidden
+    ? '<button class="card-action-btn unhide" title="Restore to Active" onclick="event.stopPropagation();unhideTask(\''+task.id+'\')">&#x1F441;</button>'
+    : '<button class="card-action-btn hide"   title="Hide this task"    onclick="event.stopPropagation();hideTask(\''+task.id+'\')">&#x1F648;</button>';
+
+  var summary =
+    '<div class="card-summary" onclick="toggleCard(\''+task.id+'\')">' +
+      '<span class="card-chevron">&#x25BC;</span>' +
+      '<div class="card-left">' +
+        '<div class="card-row1">' +
+          '<span class="card-id">'+esc(String(task.trackerId))+'</span>' +
+          typeB + cliB +
+          '<span class="status-dot '+grp+'">'+esc(task.status||"")+'</span>' +
+        '</div>' +
+        '<div class="card-subject">'+esc(task.subject)+'</div>' +
+        '<div class="card-meta-row">'+modB+pltB+dueB+'</div>' +
+      '</div>' +
+      '<div class="card-right" onclick="event.stopPropagation()">' +
+        '<button class="card-action-btn edit" title="Edit" onclick="openEditModal(\''+task.id+'\')">&#x270F;</button>' +
+        hideBtn +
+        '<button class="card-action-btn del"  title="Remove" onclick="askDelete(\''+task.id+'\')">&#x1F5D1;</button>' +
+      '</div>' +
+    '</div>';
+
+  /* done bar */
+  var doneSection = "";
+  if (task.donePct!=null) {
+    doneSection = '<div class="done-bar"><div class="done-bar-top"><span>Progress</span><span>'+task.donePct+'%</span></div><div class="done-track"><div class="done-fill" style="width:'+task.donePct+'%"></div></div></div>';
   }
-  const noteHTML = task.note
-    ? `<div style="background:#fefce8;border:1px solid #fef08a;border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--text-2);line-height:1.6;white-space:pre-wrap;word-break:break-word">${esc(task.note).replace(/\n/g,"<br>")}</div>`
-    : `<div style="background:var(--surface-2);border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text-4);font-style:italic">No comments yet. Click ✏ to add notes.</div>`;
-  return `<div class="task-card" id="card-${task.id}">
-    <div class="card-header" onclick="toggleCard('${task.id}')">
-      <span class="card-chevron">▼</span>
-      <div class="card-meta">
-        <div class="card-top-row">
-          <span class="card-id">#${task.trackerId}</span>
-          ${task.trackerType ? `<span style="font-size:11px;font-weight:600;border-radius:5px;padding:2px 8px;${typeBadgeStyle(task.trackerType)}">${esc(task.trackerType)}</span>` : ""}
-          <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;background:${cc.bg};color:${cc.text};border:1px solid ${cc.border};border-radius:5px;padding:2px 9px">${esc(task.client||"")}</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-3)"><span style="width:7px;height:7px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0"></span>${esc(task.status||"")}</span>
-        </div>
-        <div class="card-subject">${esc(task.subject)}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
-          ${task.module ? `<span style="font-size:11px;color:var(--text-3)">📦 ${esc(task.module)}</span>` : ""}
-          ${task.plant  ? `<span style="font-size:11px;color:var(--text-3)">🏭 ${esc(task.plant)}</span>`  : ""}
-          ${task.dueDate ? `<span style="font-size:11px;color:var(--text-4);font-family:var(--mono)">📅 ${fmtDate(task.dueDate)}</span>` : ""}
-        </div>
-      </div>
-      <div class="card-actions" onclick="event.stopPropagation()">
-        <button class="icon-btn edit"   title="Edit"   onclick="openEditModal('${task.id}')">✏</button>
-        <button class="icon-btn remove" title="Remove" onclick="askDelete('${task.id}')">✕</button>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="fields-grid">
-        ${fi("Assigned To", task.assignedTo)} ${fi("Author", task.author)}
-        ${fi("Priority", task.priority)}      ${fi("Version", task.version)}
-        ${fi("Start Date", fmtDate(task.startDate))} ${fi("Due Date", fmtDate(task.dueDate))}
-      </div>
-      ${doneHTML}
-      ${relHTML ? `<div class="divider"></div>${relHTML}` : ""}
-      <div class="divider"></div>
-      <div style="font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:7px">📝 Comments / Notes</div>
-      ${noteHTML}
-      <div style="font-size:10.5px;color:var(--text-4);margin-top:8px;font-family:var(--mono)">Added: ${fmtDateTime(task.addedAt)}</div>
-    </div>
-  </div>`;
+
+  /* relations */
+  var relSection = "";
+  if (task.parentId||task.childIds) {
+    relSection='<div class="rel-row">';
+    if(task.parentId) relSection+='<span class="rel-tag">&#x2B06; Parent #'+esc(task.parentId)+'</span>';
+    if(task.childIds){var ca=task.childIds.split(",");for(var ci=0;ci<ca.length;ci++){var cid=ca[ci].trim();if(cid)relSection+='<span class="rel-tag">&#x2B07; Child #'+esc(cid)+'</span>';}}
+    relSection+='</div>';
+  }
+
+  /* fields */
+  function fi(l,v){ var e=!v||v==="—"; return '<div class="field-item"><div class="field-label">'+l+'</div><div class="field-value'+(e?' empty':'')+'">'+( e ? '&#x2014;' : esc(String(v)) )+'</div></div>'; }
+
+  var noteSection = task.note
+    ? '<div class="notes-box">'+esc(task.note).replace(/\n/g,"<br>")+'</div>'
+    : '<div class="notes-empty">No comments yet &#x2014; click &#x270F; to add notes.</div>';
+
+  var body =
+    '<div class="card-body">' +
+      '<div class="fields-grid">' +
+        fi("Assigned To",task.assignedTo)+fi("Author",task.author)+fi("Priority",task.priority)+
+        fi("Version",task.version)+fi("Start Date",fmtDate(task.startDate))+fi("Due Date",fmtDate(task.dueDate)) +
+      '</div>' +
+      doneSection +
+      (relSection?'<div class="card-divider"></div>'+relSection:"") +
+      '<div class="card-divider"></div>' +
+      '<div class="field-label" style="margin-bottom:7px">&#x1F4DD; Comments / Notes</div>' +
+      noteSection +
+      '<div class="card-timestamp">Added: '+fmtDT(task.addedAt)+'</div>' +
+    '</div>';
+
+  return '<div class="'+cardClass(task.client)+(task.hidden?' hidden-card':'')+'" id="card-'+task.id+'">'+summary+body+'</div>';
 }
 
-function fi(label, val) {
-  const isEmpty = !val || val === "—";
-  return `<div><div class="fi-label">${label}</div><div class="fi-value${isEmpty ? " empty" : ""}">${isEmpty ? "—" : esc(String(val))}</div></div>`;
+function toggleCard(id) {
+  var el = document.getElementById("card-"+id);
+  if (el) el.classList.toggle("expanded");
 }
 
-function toggleCard(id) { document.getElementById(`card-${id}`)?.classList.toggle("collapsed"); }
-
-function updateSidebar() {
-  const t = STATE.tasks;
-  document.getElementById("s-total").textContent  = t.length;
-  document.getElementById("s-new").textContent    = t.filter(x => statusGroup(x.status)==="new").length;
-  document.getElementById("s-active").textContent = t.filter(x => statusGroup(x.status)==="active").length;
-  document.getElementById("s-done").textContent   = t.filter(x => statusGroup(x.status)==="released").length;
+/* ── STATS ── */
+function updateStats() {
+  var all = appState.tasks.filter(function(t){return !t.hidden;});
+  var nc=0,ac=0,rc=0;
+  for(var i=0;i<all.length;i++){
+    var g=statusGroup(all[i].status);
+    if(g==="new")nc++; if(g==="active")ac++; if(g==="released")rc++;
+  }
+  document.getElementById("s-total").textContent = all.length;
+  document.getElementById("s-new").textContent   = nc;
+  document.getElementById("s-active").textContent= ac;
+  document.getElementById("s-done").textContent  = rc;
 }
-function updateMainSub(count) {
-  const el = document.getElementById("main-sub-text");
-  if (el) el.textContent = `Showing ${count} of ${STATE.tasks.length} task${STATE.tasks.length!==1?"s":""}`;
-}
 
+/* ── EXPORT ── */
 function exportExcel() {
-  if (!window.XLSX) { toast("SheetJS not loaded.", "error"); return; }
-  if (STATE.tasks.length === 0) { toast("No tasks to export.", ""); return; }
-  const wb = XLSX.utils.book_new();
-  const clients = [...new Set(STATE.tasks.map(t => t.client || "Other"))];
-  clients.forEach(client => {
-    const ct = STATE.tasks.filter(t => (t.client||"Other") === client);
-    let rows;
-    if (client === "Henkel")   rows = ct.map((t,i) => ({"Sl.No":i+1,"Tracker type":t.trackerType||"","Module":t.module||"","Tracker id":t.trackerId,"Description":t.subject||"","Plant":t.plant||"","Status":t.status||"","Comments":t.note||""}));
-    else if (client === "WorkItem") rows = ct.map((t,i) => ({"Sl.No":i+1,"Tracker id":t.trackerId,"Description":t.subject||"","Status":t.status||"","Comments":t.note||""}));
-    else rows = ct.map((t,i) => ({"Sl.No":i+1,"Tracker type":t.trackerType||"","Tracker id":t.trackerId,"Description":t.subject||"","Status":t.status||"","Comments":t.note||""}));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const w  = client==="Henkel"?[6,14,18,10,60,14,35,60]:client==="WorkItem"?[6,10,60,35,60]:[6,14,10,60,35,60];
-    ws["!cols"] = w.map(w=>({wch:w}));
-    XLSX.utils.book_append_sheet(wb, ws, client);
-  });
-  const summary = [["My Task Tracker"],["Exported At", fmtDateTime(new Date().toISOString())],[""],["Client","Total","New","Active","Released"],...clients.map(c=>{const ct=STATE.tasks.filter(t=>(t.client||"Other")===c);return[c,ct.length,ct.filter(t=>statusGroup(t.status)==="new").length,ct.filter(t=>statusGroup(t.status)==="active").length,ct.filter(t=>statusGroup(t.status)==="released").length];}),[""],["Grand Total",STATE.tasks.length]];
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "Summary");
-  XLSX.writeFile(wb, `task-tracker-${new Date().toISOString().slice(0,10)}.xlsx`);
-  toast("Exported ✓", "success");
+  if(!window.XLSX){toast("SheetJS not loaded.","error");return;}
+  if(appState.tasks.length===0){toast("No tasks to export.","");return;}
+  var wb=XLSX.utils.book_new();
+  var clients=[];
+  for(var i=0;i<appState.tasks.length;i++){var cn=appState.tasks[i].client||"Other";if(clients.indexOf(cn)<0)clients.push(cn);}
+  for(var xc=0;xc<clients.length;xc++){
+    var cname=clients[xc]; var cTasks=[]; var rows=[];
+    for(var xt=0;xt<appState.tasks.length;xt++){if((appState.tasks[xt].client||"Other")===cname)cTasks.push(appState.tasks[xt]);}
+    for(var xr=0;xr<cTasks.length;xr++){
+      var t=cTasks[xr];
+      if(cname==="Henkel") rows.push({"Sl.No":xr+1,"Tracker type":t.trackerType||"","Module":t.module||"","Tracker id":t.trackerId,"Description":t.subject||"","Plant":t.plant||"","Status":t.status||"","Comments":t.note||"","Hidden":t.hidden?"Yes":""});
+      else if(cname==="WorkItem") rows.push({"Sl.No":xr+1,"Tracker id":t.trackerId,"Description":t.subject||"","Status":t.status||"","Comments":t.note||"","Hidden":t.hidden?"Yes":""});
+      else rows.push({"Sl.No":xr+1,"Tracker type":t.trackerType||"","Tracker id":t.trackerId,"Description":t.subject||"","Status":t.status||"","Comments":t.note||"","Hidden":t.hidden?"Yes":""});
+    }
+    var ws=XLSX.utils.json_to_sheet(rows);
+    var cw=cname==="Henkel"?[6,14,18,10,60,14,35,60,6]:cname==="WorkItem"?[6,10,60,35,60,6]:[6,14,10,60,35,60,6];
+    ws["!cols"]=cw.map(function(w){return{wch:w};});
+    XLSX.utils.book_append_sheet(wb,ws,cname);
+  }
+  var sd=[["My Task Tracker"],["Exported",fmtDT(new Date().toISOString())],[""],["Client","Total","New","Active","Released","Hidden"]];
+  for(var xs=0;xs<clients.length;xs++){
+    var sc=clients[xs]; var sct=[]; for(var st=0;st<appState.tasks.length;st++){if((appState.tasks[st].client||"Other")===sc)sct.push(appState.tasks[st]);}
+    var sn=0,sa=0,sr=0,sh=0; for(var sg=0;sg<sct.length;sg++){var g=statusGroup(sct[sg].status);if(g==="new")sn++;if(g==="active")sa++;if(g==="released")sr++;if(sct[sg].hidden)sh++;}
+    sd.push([sc,sct.length,sn,sa,sr,sh]);
+  }
+  sd.push([""]);sd.push(["Grand Total",appState.tasks.length]);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sd),"Summary");
+  XLSX.writeFile(wb,"task-tracker-"+new Date().toISOString().slice(0,10)+".xlsx");
+  toast("Exported ✓","success");
 }
 
-function importExcel() { document.getElementById("import-input").click(); }
+/* ── IMPORT ── */
+function importExcel(){ document.getElementById("import-input").click(); }
 function handleImport(event) {
-  const file = event.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const wb = XLSX.read(e.target.result, {type:"array"});
-      let imported=0, skipped=0;
-      wb.SheetNames.filter(n=>n!=="Summary").forEach(sheetName => {
-        XLSX.utils.sheet_to_json(wb.Sheets[sheetName]).forEach(row => {
-          const tid = parseInt(row["Tracker id"]||row["Tracker ID"]||0,10);
-          if (!tid || STATE.tasks.find(t=>t.trackerId===tid)) { skipped++; return; }
-          STATE.tasks.push({id:uid(),client:sheetName,trackerId:tid,trackerType:row["Tracker type"]||"",module:row["Module"]||"",plant:row["Plant"]||"",subject:row["Description"]||"",status:row["Status"]||"",note:row["Comments"]||"",priority:"",assignedTo:"",author:"",startDate:"",dueDate:"",donePct:null,version:"",parentId:"",childIds:"",project:sheetName,addedAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
+  var file=event.target.files[0]; if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:"array"}); var imported=0,skipped=0;
+      for(var si=0;si<wb.SheetNames.length;si++){
+        var sn=wb.SheetNames[si]; if(sn==="Summary")continue;
+        var rows=XLSX.utils.sheet_to_json(wb.Sheets[sn]);
+        for(var ri=0;ri<rows.length;ri++){
+          var row=rows[ri]; var tid=parseInt(row["Tracker id"]||row["Tracker ID"]||0,10);
+          if(!tid){skipped++;continue;}
+          var exists=false; for(var ei=0;ei<appState.tasks.length;ei++){if(appState.tasks[ei].trackerId===tid){exists=true;break;}}
+          if(exists){skipped++;continue;}
+          appState.tasks.push({id:uid(),client:sn,trackerId:tid,trackerType:row["Tracker type"]||"",module:row["Module"]||"",plant:row["Plant"]||"",subject:row["Description"]||"",status:row["Status"]||"",note:row["Comments"]||"",hidden:row["Hidden"]==="Yes",priority:"",assignedTo:"",author:"",startDate:"",dueDate:"",donePct:null,version:"",parentId:"",childIds:"",project:sn,addedAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
           imported++;
-        });
-      });
-      persist(); renderCards(); updateSidebar();
-      toast(`Imported ${imported}${skipped?`, ${skipped} skipped`:""}`, "success");
-    } catch(err) { toast("Import failed: "+err.message, "error"); }
-    event.target.value = "";
+        }
+      }
+      save(); renderCards(); updateStats();
+      toast("Imported "+imported+(skipped?", "+skipped+" skipped":""),"success");
+    }catch(err){toast("Import failed: "+err.message,"error");}
+    event.target.value="";
   };
   reader.readAsArrayBuffer(file);
 }
 
-function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function fmtDate(d) { if(!d)return""; try{return new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});}catch(_){return d;} }
-function fmtDateTime(d) { if(!d)return""; try{return new Date(d).toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}catch(_){return d;} }
+/* ── TOAST ── */
+var _tt=null;
+function toast(msg,type){
+  var el=document.getElementById("toast"); if(!el)return;
+  el.textContent=msg; el.className="show"+(type?" "+type:"");
+  if(_tt)clearTimeout(_tt); _tt=setTimeout(function(){el.className="";},3000);
+}
 
-let _tt=null;
-function toast(msg,type="") { const el=document.getElementById("toast"); if(!el)return; el.textContent=msg; el.className="show"+(type?" "+type:""); if(_tt)clearTimeout(_tt); _tt=setTimeout(()=>{el.className="";},3000); }
-function overlayClickClose(event,id) { if(event.target.id===id){if(id==="task-overlay")closeTaskModal();if(id==="delete-overlay")closeDelete();} }
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){closeTaskModal();closeDelete();} });
+/* ── OVERLAY ── */
+function overlayClose(event,id){
+  if(event.target.id===id){if(id==="task-overlay")closeTaskModal();if(id==="delete-overlay")closeDeleteModal();}
+}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeTaskModal();closeDeleteModal();}});
 
-(function init(){ loadFromStorage(); renderCards(); updateSidebar(); })();
+/* ── INIT ── */
+load(); renderCards(); updateStats();
