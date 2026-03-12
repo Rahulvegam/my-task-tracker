@@ -3,158 +3,151 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Task Tracker</title>
+  <title>Task Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<!-- ══════════════ ADD / EDIT TASK MODAL ══════════════ -->
-<div id="task-overlay" class="overlay hidden" onclick="overlayClickClose(event,'task-overlay')">
-  <div class="modal modal-lg">
-    <div class="modal-header">
+<!-- ═══ ADD/EDIT MODAL ═══ -->
+<div id="task-overlay" class="overlay hidden" onclick="overlayClose(event,'task-overlay')">
+  <div class="modal lg">
+    <div class="modal-head">
       <div>
         <h2 id="modal-title">Add New Task</h2>
-        <p id="modal-sub" class="modal-sub">Fill in the details from your Redmine tracker</p>
+        <div id="modal-sub" class="sub">Fill in the details from your Redmine tracker</div>
       </div>
-      <button class="icon-btn" onclick="closeTaskModal()">✕</button>
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
 
-        <div class="form-row-full">
-          <label>Tracker ID <span class="req">*</span>
-            <input id="f-id" type="number" placeholder="e.g. 4821" min="1"/>
-          </label>
-        </div>
+        <label><span class="lbl">Tracker ID<span class="req">*</span></span>
+          <input id="f-id" type="number" placeholder="e.g. 68898" min="1"/>
+        </label>
 
-        <div class="form-row-full">
-          <label>Subject / Title <span class="req">*</span>
+        <label><span class="lbl">Tracker Type</span>
+          <select id="f-tracker-type">
+            <option value="">— Select —</option>
+            <option>Bug</option><option>CR</option><option>WorkItem</option><option>Feature</option><option>Support</option>
+          </select>
+        </label>
+
+        <div class="form-full">
+          <label><span class="lbl">Subject / Description<span class="req">*</span></span>
             <input id="f-subject" type="text" placeholder="What is this task about?"/>
           </label>
         </div>
 
-        <label>Status <span class="req">*</span>
-          <select id="f-status">
+        <label><span class="lbl">Client / Project<span class="req">*</span></span>
+          <select id="f-client">
             <option value="">— Select —</option>
-            <option>New</option>
-            <option>In Progress</option>
-            <option>Feedback</option>
-            <option>Resolved</option>
-            <option>Closed</option>
-            <option>Rejected</option>
+            <option>BASF</option><option>Henkel</option><option>WorkItem</option><option>Other</option>
           </select>
         </label>
 
-        <label>Priority
+        <label><span class="lbl">Module</span>
+          <input id="f-module" type="text" placeholder="e.g. Dispatch, Manufacture"/>
+        </label>
+
+        <label><span class="lbl">Plant / Site</span>
+          <input id="f-plant" type="text" placeholder="e.g. Kunpeng, Rancho"/>
+        </label>
+
+        <div class="form-full">
+          <label><span class="lbl">Status<span class="req">*</span></span>
+            <input id="f-status" type="text" placeholder="e.g. New, Released to Production…" list="status-list"/>
+            <datalist id="status-list">
+              <option>New</option><option>In Progress</option><option>New - Design phase</option>
+              <option>Local testing Completed</option><option>Waiting for PO</option>
+              <option>PO received</option><option>Released to Production</option>
+              <option>Closed</option><option>Rejected</option><option>Competed</option>
+            </datalist>
+          </label>
+        </div>
+
+        <label><span class="lbl">Priority</span>
           <select id="f-priority">
             <option value="">— Select —</option>
-            <option>Low</option>
-            <option>Normal</option>
-            <option>High</option>
-            <option>Urgent</option>
-            <option>Immediate</option>
+            <option>Low</option><option>Normal</option><option>High</option><option>Urgent</option><option>Immediate</option>
           </select>
         </label>
 
-        <label>Project / Product
-          <input id="f-project" type="text" placeholder="e.g. Portal v3"/>
+        <label><span class="lbl">Assigned To</span>
+          <input id="f-assigned" type="text" placeholder="Developer name"/>
         </label>
 
-        <label>Tracker Type
-          <input id="f-tracker-type" type="text" placeholder="e.g. Bug, Feature, Support"/>
-        </label>
-
-        <label>Assigned To
-          <input id="f-assigned" type="text" placeholder="Your name"/>
-        </label>
-
-        <label>Author / Reporter
+        <label><span class="lbl">Author / Reporter</span>
           <input id="f-author" type="text" placeholder="Who raised this?"/>
         </label>
 
-        <label>Start Date
-          <input id="f-start" type="date"/>
-        </label>
-
-        <label>Due Date
-          <input id="f-due" type="date"/>
-        </label>
-
-        <label>Done %
-          <input id="f-done" type="number" min="0" max="100" placeholder="0 – 100"/>
-        </label>
-
-        <label>Version / Sprint
+        <label><span class="lbl">Version / Sprint</span>
           <input id="f-version" type="text" placeholder="e.g. v2.4.1"/>
         </label>
 
-        <label>Parent Tracker ID
-          <input id="f-parent" type="number" placeholder="e.g. 4800" min="1"/>
+        <label><span class="lbl">Start Date</span><input id="f-start" type="date"/></label>
+        <label><span class="lbl">Due Date</span><input id="f-due" type="date"/></label>
+
+        <label><span class="lbl">Done %</span>
+          <input id="f-done" type="number" min="0" max="100" placeholder="0–100"/>
         </label>
 
-        <label>Child Tracker IDs
+        <label><span class="lbl">Parent Tracker ID</span>
+          <input id="f-parent" type="number" placeholder="e.g. 4800"/>
+        </label>
+
+        <label><span class="lbl">Child / Related IDs</span>
           <input id="f-children" type="text" placeholder="Comma separated: 4822, 4823"/>
         </label>
 
-        <label>Related Tracker IDs
-          <input id="f-relations" type="text" placeholder="Comma separated: 4900, 4901"/>
-        </label>
-
-        <label>Category
-          <input id="f-category" type="text" placeholder="e.g. UI, Backend, Auth"/>
-        </label>
-
-        <div class="form-row-full">
-          <label>Description
-            <textarea id="f-desc" rows="3" placeholder="Brief description of the task…"></textarea>
-          </label>
-        </div>
-
-        <div class="form-row-full">
-          <label>My Notes
-            <textarea id="f-note" rows="4" placeholder="Post-demo notes, observations, anything personal…"></textarea>
+        <div class="form-full">
+          <label><span class="lbl">Comments / My Notes</span>
+            <textarea id="f-note" rows="3" placeholder="Post-demo notes, SOW details, client comments…"></textarea>
           </label>
         </div>
 
       </div>
-
       <div class="modal-actions">
-        <button class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
-        <button class="btn-primary" onclick="saveTask()">Save Task</button>
+        <button class="btn-cancel" onclick="closeTaskModal()">Cancel</button>
+        <button class="btn-save" onclick="saveTask()">Save Task</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ DELETE CONFIRM MODAL ══════════════ -->
-<div id="delete-overlay" class="overlay hidden" onclick="overlayClickClose(event,'delete-overlay')">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <h2>Remove Task</h2>
-      <button class="icon-btn" onclick="closeDelete()">✕</button>
+<!-- ═══ DELETE MODAL ═══ -->
+<div id="delete-overlay" class="overlay hidden" onclick="overlayClose(event,'delete-overlay')">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div>
+        <h2>Remove Task</h2>
+        <div class="sub">This only removes from your local tracker</div>
+      </div>
+      <button class="modal-close" onclick="closeDeleteModal()">✕</button>
     </div>
     <div class="modal-body">
-      <p style="color:var(--text-2);font-size:14px;margin-bottom:20px">
-        Are you sure you want to remove tracker <strong id="delete-id-label"></strong> from your list?
-        <br><span style="font-size:12px;color:var(--text-4)">This only removes it from the app. Nothing changes in Redmine.</span>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:6px">Remove <strong id="delete-id-label"></strong>?</p>
+      <p style="color:var(--text3);font-size:12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;padding:10px;line-height:1.6">
+        ⚠ This app has <strong>zero connection to Redmine</strong>.<br>
+        Nothing will change in Redmine — only your local tracker is affected.<br>
+        Your Excel backup keeps the data safe if you export regularly.
       </p>
       <div class="modal-actions">
-        <button class="btn-secondary" onclick="closeDelete()">Cancel</button>
-        <button class="btn-danger" onclick="confirmDelete()">Remove</button>
+        <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-delete" onclick="confirmDelete()">Remove from Tracker</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ APP SHELL ══════════════ -->
+<!-- ═══ APP ═══ -->
 <div id="app">
 
   <!-- SIDEBAR -->
   <aside id="sidebar">
-    <div class="sidebar-brand">
+    <div class="brand">
       <div class="brand-icon">T</div>
       <div>
         <div class="brand-title">Task Tracker</div>
@@ -162,87 +155,108 @@
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <button class="btn-add-task" onclick="openAddModal()">
-        <span>+</span> Add New Task
+    <div class="sb-section">
+      <button class="btn-add" onclick="openAddModal()">
+        <span class="plus">+</span> Add New Task
       </button>
     </div>
 
-    <div class="sidebar-section">
-      <div class="section-label">Filter by Status</div>
-      <div class="filter-pills" id="filter-pills">
-        <button class="pill active" data-filter="all" onclick="setFilter('all',this)">All</button>
-        <button class="pill" data-filter="New" onclick="setFilter('New',this)">New</button>
-        <button class="pill" data-filter="In Progress" onclick="setFilter('In Progress',this)">In Progress</button>
-        <button class="pill" data-filter="Feedback" onclick="setFilter('Feedback',this)">Feedback</button>
-        <button class="pill" data-filter="Resolved" onclick="setFilter('Resolved',this)">Resolved</button>
-        <button class="pill" data-filter="Closed" onclick="setFilter('Closed',this)">Closed</button>
-        <button class="pill" data-filter="Rejected" onclick="setFilter('Rejected',this)">Rejected</button>
+    <div class="sb-section">
+      <div class="sb-label">Client</div>
+      <div class="pills" id="client-pills">
+        <button class="pill active" onclick="setClient('all',this)">All</button>
+        <button class="pill" onclick="setClient('BASF',this)">BASF</button>
+        <button class="pill henkel" onclick="setClient('Henkel',this)">Henkel</button>
+        <button class="pill workitem" onclick="setClient('WorkItem',this)">WorkItem</button>
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <div class="section-label">Sort by</div>
-      <select id="sort-select" onchange="setSort(this.value)" class="sort-select">
+    <div class="sb-section">
+      <div class="sb-label">Status</div>
+      <div class="pills" id="status-pills">
+        <button class="pill active" onclick="setFilter('all',this)">All</button>
+        <button class="pill" onclick="setFilter('new',this)">New</button>
+        <button class="pill" onclick="setFilter('active',this)">Active</button>
+        <button class="pill" onclick="setFilter('released',this)">Released</button>
+        <button class="pill" onclick="setFilter('closed',this)">Closed</button>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Type</div>
+      <div class="pills" id="type-pills">
+        <button class="pill active" onclick="setType('all',this)">All</button>
+        <button class="pill" onclick="setType('Bug',this)">Bug</button>
+        <button class="pill" onclick="setType('CR',this)">CR</button>
+        <button class="pill workitem" onclick="setType('WorkItem',this)">WorkItem</button>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Sort By</div>
+      <select class="sort-sel" onchange="setSort(this.value)">
         <option value="added_desc">Recently Added</option>
         <option value="added_asc">Oldest First</option>
         <option value="id_asc">Tracker ID ↑</option>
         <option value="id_desc">Tracker ID ↓</option>
-        <option value="due_asc">Due Date ↑</option>
-        <option value="status">Status</option>
-        <option value="priority">Priority</option>
+        <option value="client">Client</option>
       </select>
     </div>
 
-    <div class="sidebar-section">
-      <div class="section-label">Actions</div>
-      <button class="sidebar-btn" onclick="exportExcel()">
-        <span class="sidebar-btn-icon">⬇</span> Export to Excel
-      </button>
-      <button class="sidebar-btn" onclick="importExcel()">
-        <span class="sidebar-btn-icon">⬆</span> Import from Excel
+    <div class="sb-section">
+      <div class="sb-label">Actions</div>
+      <button class="sb-btn" onclick="exportExcel()"><span class="sb-icon">⬇</span> Export to Excel</button>
+      <button class="sb-btn" onclick="importExcel()">
+        <span class="sb-icon">⬆</span> Import from Excel
         <input type="file" id="import-input" accept=".xlsx" style="display:none" onchange="handleImport(event)"/>
       </button>
     </div>
 
-    <div class="sidebar-section">
-      <div class="section-label">Summary</div>
+    <div class="sb-section" style="padding-bottom:20px">
+      <div class="sb-label">Summary</div>
       <div class="stats-grid">
-        <div class="stat-item"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
-        <div class="stat-item"><div class="stat-num" id="s-open">0</div><div class="stat-lbl">Open</div></div>
-        <div class="stat-item"><div class="stat-num" id="s-progress">0</div><div class="stat-lbl">In Progress</div></div>
-        <div class="stat-item"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Done</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-card"><div class="stat-num blue" id="s-new">0</div><div class="stat-lbl">New</div></div>
+        <div class="stat-card"><div class="stat-num amber" id="s-active">0</div><div class="stat-lbl">Active</div></div>
+        <div class="stat-card"><div class="stat-num green" id="s-done">0</div><div class="stat-lbl">Released</div></div>
       </div>
     </div>
   </aside>
 
   <!-- MAIN -->
   <main id="main">
-    <div class="main-topbar">
-      <div>
-        <h1 class="main-title">My Assigned Tasks</h1>
-        <div class="main-sub" id="main-sub-text">Track your Redmine tasks with personal notes</div>
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>My Assigned Tasks</h1>
+        <div class="sub" id="main-sub">Loading…</div>
       </div>
-      <div class="topbar-search">
-        <input id="search-input" type="text" placeholder="🔍  Search by ID, title, project…" oninput="renderCards()"/>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="search-input" type="text" placeholder="Search ID, title, module, plant…" oninput="renderCards()"/>
       </div>
     </div>
 
-    <!-- EMPTY STATE -->
-    <div id="empty-state" class="empty-state">
-      <div class="empty-icon">📋</div>
-      <div class="empty-title">No tasks yet</div>
-      <div class="empty-sub">Click <strong>+ Add New Task</strong> in the sidebar to start tracking your Redmine assignments.</div>
+    <div class="tabs-bar">
+      <button class="tab-btn active" id="tab-active" onclick="switchTab('active',this)">
+        Active Tasks <span class="tab-badge" id="tab-active-count">0</span>
+      </button>
+      <button class="tab-btn hidden-tab" id="tab-hidden" onclick="switchTab('hidden',this)">
+        Hidden <span class="tab-badge" id="tab-hidden-count">0</span>
+      </button>
     </div>
 
-    <!-- CARDS GRID -->
-    <div id="cards-container"></div>
+    <div id="content-area">
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">No tasks found</div>
+        <div class="empty-sub">Try a different filter or click <strong>+ Add New Task</strong></div>
+      </div>
+      <div id="cards-container"></div>
+    </div>
   </main>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
-
 <script src="js/app.js"></script>
 </body>
 </html>
