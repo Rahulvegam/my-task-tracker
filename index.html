@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Hi Rahul</title>
+<title>Task Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -71,8 +71,8 @@ html, body {
   filter: blur(10px);
   opacity: 0.55;
   animation: aurora 30s linear infinite;
-  mask-image: radial-gradient(ellipse at 100% 0%, black 10%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse at 100% 0%, black 10%, transparent 70%);
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 #aurora-bg::after {
   content: "";
@@ -104,13 +104,13 @@ html, body {
 #sidebar {
   width: var(--sidebar);
   min-width: var(--sidebar);
-  background: var(--glass);
-  backdrop-filter: blur(24px) saturate(1.6);
-  -webkit-backdrop-filter: blur(24px) saturate(1.6);
-  border-right: 1px solid var(--border);
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  border-right: 1px solid rgba(255,255,255,0.6);
   display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
-  box-shadow: 2px 0 20px rgba(20,24,36,0.06);
+  box-shadow: 2px 0 24px rgba(100,120,220,0.08);
   position: relative; z-index: 10;
 }
 
@@ -210,7 +210,7 @@ html, body {
 #lamp-header {
   position: relative; flex-shrink: 0;
   height: 108px;
-  background: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.38);
   backdrop-filter: blur(28px) saturate(1.5);
   -webkit-backdrop-filter: blur(28px) saturate(1.5);
   overflow: hidden;
@@ -286,7 +286,7 @@ html, body {
 .tabs-bar {
   padding: 0 28px;
   display: flex; gap: 0;
-  background: var(--glass);
+  background: rgba(255,255,255,0.38);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border2);
   flex-shrink: 0;
@@ -331,7 +331,7 @@ html, body {
 ═════════════════════════ */
 .task-card {
   position: relative;
-  background: var(--glass);
+  background: rgba(255,255,255,0.46);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   border: 1px solid var(--border);
@@ -593,6 +593,61 @@ select option { background: #edf0f8; }
   font-size: 12.5px; color: var(--text2); line-height: 1.65; margin-top: 8px;
 }
 
+/* ── REDMINE SYNC ── */
+.sync-status-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; border-radius: 8px; margin-bottom: 6px;
+  font-size: 11.5px; font-weight: 500;
+}
+.sync-status-bar.connected     { background: var(--green-lt); border: 1px solid rgba(31,122,82,.18); color: var(--green); }
+.sync-status-bar.not-connected { background: rgba(20,24,36,0.05); border: 1px dashed var(--border2); color: var(--text3); }
+.sync-status-bar.error         { background: var(--red-lt); border: 1px solid rgba(176,40,40,.18); color: var(--red); }
+.sync-status-bar.syncing       { background: var(--blue-lt); border: 1px solid rgba(52,96,212,.18); color: var(--blue); }
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: currentColor;
+}
+.sync-dot.pulse { animation: syncPulse 1.2s ease-in-out infinite; }
+@keyframes syncPulse { 0%,100%{opacity:.4;transform:scale(0.9)} 50%{opacity:1;transform:scale(1.2)} }
+.sync-btn { margin-bottom: 5px; }
+.sync-notice {
+  background: rgba(20,24,36,0.03); border: 1px dashed var(--border2);
+  border-radius: 8px; padding: 10px 11px;
+  font-size: 11.5px; color: var(--text3); line-height: 1.55;
+}
+.sync-notice strong { color: var(--text2); }
+.sync-link { color: var(--accent); font-size: 11px; text-decoration: none; display: inline-block; margin-top: 5px; }
+.sync-link:hover { text-decoration: underline; }
+
+/* push-update modal row */
+.push-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border2);
+}
+.push-row:last-child { border-bottom: none; }
+.push-field { font-size: 12px; color: var(--text2); }
+.push-field .key  { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text4); margin-bottom: 1px; }
+.push-field .val  { font-size: 12.5px; color: var(--text1); }
+.push-badge-changed { font-size: 10px; background: var(--amber-lt); color: var(--amber); border: 1px solid rgba(154,96,16,.2); padding: 1px 7px; border-radius: 99px; }
+
+/* install guide */
+.guide-step {
+  display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start;
+}
+.guide-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.guide-text { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+.guide-text strong { color: var(--text1); }
+.guide-text code {
+  font-family: var(--mono); font-size: 11px;
+  background: rgba(79,110,247,0.08); padding: 1px 5px;
+  border-radius: 4px; color: var(--accent);
+}
+
 /* TOAST */
 #toast {
   position: fixed; bottom: 24px; left: 50%;
@@ -616,6 +671,64 @@ select option { background: #edf0f8; }
 
 <!-- Aurora background -->
 <div id="aurora-bg"></div>
+
+<!-- INSTALL GUIDE MODAL -->
+<div id="install-overlay" class="overlay hidden" onclick="overlayClose(event,'install-overlay')">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div><h2>Install Redmine Bridge</h2><div class="sub">One-time setup — takes 2 minutes</div></div>
+      <button class="modal-x" onclick="closeInstallGuide()"><svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="guide-step">
+        <div class="guide-num">1</div>
+        <div class="guide-text">Download the extension folder from your <strong>GitHub repo</strong> — it's in the <code>extension/</code> folder. Or download the ZIP from the release page.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">2</div>
+        <div class="guide-text">Open Chrome and go to <code>chrome://extensions</code></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div class="guide-text">Turn on <strong>Developer mode</strong> (toggle in top-right corner)</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div class="guide-text">Click <strong>Load unpacked</strong> → select the <code>extension/</code> folder</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">5</div>
+        <div class="guide-text">Click the 🧩 puzzle icon in Chrome toolbar → find <strong>Redmine Bridge</strong> → click it → enter your Redmine URL and API key → Save</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">6</div>
+        <div class="guide-text">Come back here — the sidebar will show <strong style="color:var(--green)">Connected ✓</strong> and you can pull tasks from Redmine!</div>
+      </div>
+      <div style="background:var(--blue-lt);border:1px solid rgba(52,96,212,.15);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2);margin-top:4px">
+        💡 <strong>API Key:</strong> In Redmine → top-right avatar → <em>My Account</em> → scroll to bottom → <em>API Access Key</em> → Show
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUSH TO REDMINE MODAL -->
+<div id="push-overlay" class="overlay hidden" onclick="overlayClose(event,'push-overlay')">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div><h2 id="push-title">Push to Redmine</h2><div id="push-sub" class="sub">Update this issue in Redmine</div></div>
+      <button class="modal-x" onclick="closePushModal()"><svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="push-fields"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closePushModal()">Cancel</button>
+        <button class="btn-save" onclick="confirmPush()" style="background:linear-gradient(135deg,var(--green),#2a9468)">
+          Push to Redmine
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ADD/EDIT MODAL -->
 <div id="task-overlay" class="overlay hidden" onclick="overlayClose(event,'task-overlay')">
@@ -679,7 +792,7 @@ select option { background: #edf0f8; }
   <aside id="sidebar">
     <div class="brand">
       <div class="brand-icon">T</div>
-      <div><div class="brand-name">Task Tracker</div><div class="brand-sub">Manage your tasks </div></div>
+      <div><div class="brand-name">Task Tracker</div><div class="brand-sub">Redmine Personal Log</div></div>
     </div>
     <div class="sb-sec">
       <button class="btn-add" onclick="openAddModal()">
@@ -731,6 +844,27 @@ select option { background: #edf0f8; }
         Import from Excel
         <input type="file" id="import-input" accept=".xlsx" style="display:none" onchange="handleImport(event)"/>
       </button>
+    </div>
+
+    <!-- REDMINE SYNC -->
+    <div class="sb-sec" id="sync-section">
+      <div class="sb-lbl">Redmine Sync</div>
+      <div id="sync-status-bar" class="sync-status-bar not-connected">
+        <span id="sync-dot" class="sync-dot"></span>
+        <span id="sync-status-text">Extension not detected</span>
+      </div>
+      <button class="sb-btn sync-btn" id="btn-fetch-redmine" onclick="fetchFromRedmine()" style="display:none">
+        <svg viewBox="0 0 13 13" fill="none"><polyline points="1,6.5 12,6.5"/><polyline points="8,3 12,6.5 8,10"/><path d="M9,2 A6,6 0 1,0 11,5" stroke-width="1.2"/></svg>
+        Pull from Redmine
+      </button>
+      <button class="sb-btn sync-btn" id="btn-last-sync" style="display:none;font-size:10.5px;color:var(--text4)">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5"/><polyline points="6.5,3.5 6.5,6.5 8.5,8"/></svg>
+        <span id="last-sync-label">Never synced</span>
+      </button>
+      <div id="sync-no-ext" class="sync-notice">
+        <p>Install the <strong>Redmine Bridge</strong> extension to sync live data.</p>
+        <a href="#" onclick="showInstallGuide()" class="sync-link">How to install →</a>
+      </div>
     </div>
     <div class="sb-sec" style="padding-bottom:20px"><div class="sb-lbl">Summary</div>
       <div class="stats-grid">
@@ -924,6 +1058,11 @@ function buildCard(t,idx){
           '<button class="ca-btn edit" title="Edit" onclick="openEditModal(\''+t.id+'\')">'+
             '<svg viewBox="0 0 13 13" fill="none"><path d="M2 9.5L1 12l2.5-1 7-7-1.5-1.5z"/><line x1="9" y1="2" x2="11" y2="4"/></svg>'+
           '</button>'+hideBtn+
+          (EXTENSION_ID ?
+            '<button class="ca-btn push" title="Push to Redmine" onclick="event.stopPropagation();openPushModal(\''+t.id+'\')" style="color:var(--green)">'+
+              '<svg viewBox="0 0 13 13" fill="none"><polyline points="6.5,9 6.5,1"/><polyline points="3.5,4 6.5,1 9.5,4"/><path d="M2,10 Q2,12 4,12 L9,12 Q11,12 11,10"/></svg>'+
+            '</button>'
+          : '')+
           '<button class="ca-btn del" title="Remove" onclick="askDelete(\''+t.id+'\')">'+
             '<svg viewBox="0 0 13 13" fill="none"><polyline points="1,3 12,3"/><path d="M4 3V2h5v1"/><rect x="2" y="3" width="9" height="9" rx="1"/><line x1="5" y1="6" x2="5" y2="9"/><line x1="8" y1="6" x2="8" y2="9"/></svg>'+
           '</button>'+
@@ -995,9 +1134,275 @@ function handleImport(event){
   };reader.readAsArrayBuffer(file);
 }
 
+/* ════════════════════════════════
+   REDMINE SYNC via Browser Extension
+════════════════════════════════ */
+var EXTENSION_ID = null; // will be auto-detected
+var redmineStatuses = []; // cached from API
+var pushTaskId = null;    // task being pushed
+
+// Known extension IDs to try (update after loading extension)
+var KNOWN_IDS = [];
+
+async function extSend(msg) {
+  // Try externally_connectable (from web page to extension)
+  if (EXTENSION_ID) {
+    return new Promise(function(resolve) {
+      try {
+        chrome.runtime.sendMessage(EXTENSION_ID, msg, function(res) {
+          if (chrome.runtime.lastError) { EXTENSION_ID = null; resolve(null); }
+          else resolve(res);
+        });
+      } catch(e) { resolve(null); }
+    });
+  }
+  return null;
+}
+
+async function detectExtension() {
+  // chrome.runtime is only available if the extension declared this origin
+  if (typeof chrome === 'undefined' || !chrome.runtime) {
+    setSyncUI('not-connected', 'Install the extension to sync');
+    return false;
+  }
+  // Try stored ID first
+  try {
+    var stored = localStorage.getItem('rtt_ext_id');
+    if (stored) { EXTENSION_ID = stored; }
+  } catch(e) {}
+
+  if (EXTENSION_ID) {
+    var res = await extSend({ action: 'ping' });
+    if (res && res.ok) {
+      if (res.data.configured) {
+        setSyncUI('connected', 'Connected to Redmine');
+        showSyncButtons(true);
+        loadCachedStatuses();
+      } else {
+        setSyncUI('error', 'Extension found — needs config');
+        showSyncButtons(false);
+      }
+      return true;
+    }
+  }
+  setSyncUI('not-connected', 'Extension not detected');
+  showSyncButtons(false);
+  return false;
+}
+
+function setSyncUI(state, text) {
+  var bar  = document.getElementById('sync-status-bar');
+  var dot  = document.getElementById('sync-dot');
+  var txt  = document.getElementById('sync-status-text');
+  var noExt = document.getElementById('sync-no-ext');
+  if (!bar) return;
+  bar.className = 'sync-status-bar ' + state;
+  txt.textContent = text;
+  dot.className = 'sync-dot' + (state === 'syncing' ? ' pulse' : '');
+  if (noExt) noExt.style.display = (state === 'not-connected') ? 'block' : 'none';
+}
+
+function showSyncButtons(show) {
+  var btnFetch = document.getElementById('btn-fetch-redmine');
+  var btnLast  = document.getElementById('btn-last-sync');
+  if (btnFetch) btnFetch.style.display = show ? 'flex' : 'none';
+  if (btnLast)  btnLast.style.display  = show ? 'flex' : 'none';
+}
+
+async function fetchFromRedmine() {
+  setSyncUI('syncing', 'Pulling from Redmine…');
+  document.getElementById('sync-dot').classList.add('pulse');
+  var res = await extSend({ action: 'fetchMyIssues' });
+  if (!res || !res.ok) {
+    setSyncUI('error', 'Fetch failed: ' + (res && res.error ? res.error : 'No response'));
+    return;
+  }
+  var issues = res.data || [];
+  var added = 0, updated = 0;
+  issues.forEach(function(issue) {
+    var existing = null;
+    for (var i = 0; i < S.tasks.length; i++) {
+      if (S.tasks[i].trackerId === issue.id) { existing = S.tasks[i]; break; }
+    }
+    var mapped = mapRedmineIssue(issue);
+    if (existing) {
+      // Update fields from Redmine but preserve local notes/hidden
+      var localNote = existing.note;
+      Object.assign(existing, mapped, { note: existing.note || mapped.note, hidden: existing.hidden });
+      existing.syncedAt = new Date().toISOString();
+      updated++;
+    } else {
+      mapped.id = uid();
+      mapped.addedAt = new Date().toISOString();
+      mapped.updatedAt = mapped.addedAt;
+      mapped.syncedAt  = mapped.addedAt;
+      mapped.hidden = false;
+      S.tasks.unshift(mapped);
+      added++;
+    }
+  });
+  save();
+  renderCards();
+  updateStats();
+  var now = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  setSyncUI('connected', 'Synced · ' + now);
+  var label = document.getElementById('last-sync-label');
+  if (label) label.textContent = 'Last sync: ' + now;
+  toast('Pulled ' + issues.length + ' issues — ' + added + ' new, ' + updated + ' updated', 'success');
+}
+
+function mapRedmineIssue(issue) {
+  // Map Redmine API fields → our task schema
+  var client = guessClient(issue);
+  return {
+    trackerId:   issue.id,
+    subject:     issue.subject || '',
+    status:      (issue.status && issue.status.name) || '',
+    trackerType: (issue.tracker && issue.tracker.name) || '',
+    client:      client,
+    project:     (issue.project && issue.project.name) || '',
+    module:      getCustomField(issue, 'Module') || getCategoryName(issue) || '',
+    plant:       getCustomField(issue, 'Plant') || getCustomField(issue, 'Site') || '',
+    priority:    (issue.priority && issue.priority.name) || '',
+    assignedTo:  (issue.assigned_to && issue.assigned_to.name) || '',
+    author:      (issue.author && issue.author.name) || '',
+    startDate:   issue.start_date || '',
+    dueDate:     issue.due_date || '',
+    donePct:     issue.done_ratio != null ? issue.done_ratio : null,
+    version:     (issue.fixed_version && issue.fixed_version.name) || '',
+    parentId:    (issue.parent && issue.parent.id) ? String(issue.parent.id) : '',
+    childIds:    '',
+    note:        issue.description || '',
+    redmineStatusId: issue.status && issue.status.id,
+    redmineProjectId: issue.project && issue.project.id
+  };
+}
+
+function guessClient(issue) {
+  var name = ((issue.project && issue.project.name) || '').toLowerCase();
+  if (name.indexOf('basf')     >= 0) return 'BASF';
+  if (name.indexOf('henkel')   >= 0) return 'Henkel';
+  if (name.indexOf('work')     >= 0) return 'WorkItem';
+  return issue.project ? issue.project.name : 'Other';
+}
+function getCategoryName(issue) {
+  return issue.category ? issue.category.name : '';
+}
+function getCustomField(issue, name) {
+  if (!issue.custom_fields) return '';
+  for (var i = 0; i < issue.custom_fields.length; i++) {
+    if (issue.custom_fields[i].name === name) return issue.custom_fields[i].value || '';
+  }
+  return '';
+}
+
+/* ── PUSH TO REDMINE ── */
+async function loadCachedStatuses() {
+  if (redmineStatuses.length) return;
+  var res = await extSend({ action: 'fetchStatuses' });
+  if (res && res.ok) redmineStatuses = res.data || [];
+}
+
+function openPushModal(taskId) {
+  var t = findTask(taskId);
+  if (!t) return;
+  pushTaskId = taskId;
+  document.getElementById('push-title').textContent = 'Push #' + t.trackerId + ' to Redmine';
+  document.getElementById('push-sub').textContent = t.subject.slice(0, 60) + (t.subject.length > 60 ? '…' : '');
+
+  var statusOptions = redmineStatuses.length
+    ? redmineStatuses.map(function(s) {
+        return '<option value="' + s.id + '"' + (t.redmineStatusId === s.id ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+      }).join('')
+    : '<option value="">— Load statuses first —</option>';
+
+  var html = [
+    '<div class="push-row">',
+    '  <div class="push-field"><div class="key">Status</div>',
+    '  <select id="push-status" style="margin-top:4px;width:100%;padding:6px 9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;outline:none;color:var(--text1)">',
+    statusOptions,
+    '  </select></div>',
+    '</div>',
+    '<div class="push-row">',
+    '  <div class="push-field" style="width:100%"><div class="key">Done % (0–100)</div>',
+    '  <input id="push-done" type="number" min="0" max="100" value="' + (t.donePct || 0) + '" style="margin-top:4px;width:100%;padding:6px 9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;outline:none;color:var(--text1)"/>',
+    '  </div>',
+    '</div>',
+    '<div class="push-row">',
+    '  <div class="push-field" style="width:100%"><div class="key">Add a note / journal entry (optional)</div>',
+    '  <textarea id="push-note" rows="3" placeholder="Comment to add in Redmine journal…" style="margin-top:4px;width:100%;padding:7px 9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;outline:none;resize:vertical;color:var(--text1)"></textarea>',
+    '  </div>',
+    '</div>',
+    '<div style="background:var(--amber-lt);border:1px solid rgba(154,96,16,.18);border-radius:8px;padding:9px 11px;font-size:11.5px;color:var(--amber);margin-top:4px">',
+    '  ⚡ This will immediately update issue #' + t.trackerId + ' in Redmine. This cannot be undone.',
+    '</div>'
+  ].join('');
+  document.getElementById('push-fields').innerHTML = html;
+  document.getElementById('push-overlay').classList.remove('hidden');
+  // Load statuses if missing
+  if (!redmineStatuses.length) loadCachedStatuses().then(function() {
+    // Re-render if now loaded
+    openPushModal(taskId);
+  });
+}
+
+function closePushModal() {
+  document.getElementById('push-overlay').classList.add('hidden');
+  pushTaskId = null;
+}
+
+async function confirmPush() {
+  var t = findTask(pushTaskId);
+  if (!t) return;
+  var statusEl = document.getElementById('push-status');
+  var doneEl   = document.getElementById('push-done');
+  var noteEl   = document.getElementById('push-note');
+  var fields = {};
+  if (statusEl && statusEl.value) fields.status_id = parseInt(statusEl.value, 10);
+  if (doneEl)  fields.done_ratio = parseInt(doneEl.value, 10) || 0;
+  var noteVal = (noteEl && noteEl.value.trim()) || '';
+  if (noteVal) fields.notes = noteVal;
+  if (!Object.keys(fields).length) { toast('Nothing to push.', ''); return; }
+  setSyncUI('syncing', 'Pushing to Redmine…');
+  var res = await extSend({ action: 'updateIssue', id: t.trackerId, fields: fields });
+  if (res && res.ok) {
+    // Update locally too
+    if (fields.status_id) {
+      var st = redmineStatuses.find(function(s) { return s.id === fields.status_id; });
+      if (st) { t.status = st.name; t.redmineStatusId = st.id; }
+    }
+    if (fields.done_ratio != null) t.donePct = fields.done_ratio;
+    t.updatedAt = new Date().toISOString();
+    save(); renderCards(); updateStats();
+    setSyncUI('connected', 'Push successful ✓');
+    toast('Issue #' + t.trackerId + ' updated in Redmine ✓', 'success');
+    closePushModal();
+  } else {
+    setSyncUI('error', 'Push failed');
+    toast('Push failed: ' + (res && res.error ? res.error : 'No response from extension'), 'error');
+  }
+}
+
+function showInstallGuide() {
+  document.getElementById('install-overlay').classList.remove('hidden');
+}
+function closeInstallGuide() {
+  document.getElementById('install-overlay').classList.add('hidden');
+}
+
+// Expose extension ID setter (called from extension content script if needed)
+window.setRedmineBridgeId = function(id) {
+  EXTENSION_ID = id;
+  localStorage.setItem('rtt_ext_id', id);
+  detectExtension();
+};
+
+// Auto-detect on load
+setTimeout(detectExtension, 800);
+
 var _tt=null;
 function toast(msg,type){var el=document.getElementById("toast");if(!el)return;el.textContent=msg;el.className="show"+(type?" "+type:"");if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.className="";},3000);}
-function overlayClose(e,id){if(e.target.id===id){if(id==="task-overlay")closeTaskModal();if(id==="delete-overlay")closeDeleteModal();}}
+function overlayClose(e,id){if(e.target.id===id){if(id==="task-overlay")closeTaskModal();if(id==="delete-overlay")closeDeleteModal();if(id==="push-overlay")closePushModal();if(id==="install-overlay")closeInstallGuide();}}
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeTaskModal();closeDeleteModal();}});
 
 load();renderCards();updateStats();
