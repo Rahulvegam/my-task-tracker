@@ -56,40 +56,10 @@ html, body {
   line-height: 1.5;
   overflow: hidden;
   color: var(--text1);
-  background: #f8f9ff;
+  background: linear-gradient(135deg, #eef1fb 0%, #f3f0ff 40%, #edf6f3 100%);
 }
 
-/* Aurora layer */
-#aurora-bg {
-  position: fixed; inset: -10px; z-index: 0; pointer-events: none;
-  background-image:
-    repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
-    repeating-linear-gradient(100deg,
-      #93c5fd 10%, #a5b4fc 15%, #bfdbfe 20%, #ddd6fe 25%, #bae6fd 30%);
-  background-size: 300% 200%;
-  background-position: 50% 50%;
-  filter: blur(10px);
-  opacity: 0.55;
-  animation: aurora 30s linear infinite;
-  mask-image: none;
-  -webkit-mask-image: none;
-}
-#aurora-bg::after {
-  content: "";
-  position: absolute; inset: 0;
-  background-image:
-    repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
-    repeating-linear-gradient(100deg,
-      #93c5fd 10%, #a5b4fc 15%, #bfdbfe 20%, #ddd6fe 25%, #bae6fd 30%);
-  background-size: 200% 100%;
-  background-attachment: fixed;
-  mix-blend-mode: difference;
-  animation: aurora 20s linear infinite;
-}
-@keyframes aurora {
-  from { background-position: 50% 50%, 50% 50%; }
-  to   { background-position: 350% 50%, 350% 50%; }
-}
+/* Clean static background — no animation */
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -669,8 +639,7 @@ select option { background: #edf0f8; }
 </head>
 <body>
 
-<!-- Aurora background -->
-<div id="aurora-bg"></div>
+
 
 <!-- INSTALL GUIDE MODAL -->
 <div id="install-overlay" class="overlay hidden" onclick="overlayClose(event,'install-overlay')">
