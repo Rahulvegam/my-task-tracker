@@ -1,136 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Task Tracker</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css"/>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Task Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   TASK TRACKER · Frosted Gradient Mesh · v7
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f0f2f8;
+  --glass:     rgba(255,255,255,0.62);
+  --glass2:    rgba(255,255,255,0.45);
+  --glass3:    rgba(255,255,255,0.28);
+  --border:    rgba(255,255,255,0.75);
+  --border2:   rgba(200,210,235,0.6);
+  --border3:   rgba(180,195,225,0.5);
+  --text1:     #141824;
+  --text2:     #3d4560;
+  --text3:     #7a86a8;
+  --text4:     #aab4cc;
+  --blue:      #3460d4;
+  --blue-lt:   rgba(52,96,212,0.09);
+  --green:     #1f7a52;
+  --green-lt:  rgba(31,122,82,0.09);
+  --amber:     #9a6010;
+  --amber-lt:  rgba(154,96,16,0.09);
+  --red:       #b02828;
+  --red-lt:    rgba(176,40,40,0.09);
+  --accent:    #4f6ef7;
+  --accent2:   #7c95fb;
+  --shadow-sm: 0 1px 3px rgba(20,24,36,0.07), 0 1px 2px rgba(20,24,36,0.04);
+  --shadow-md: 0 8px 32px rgba(20,24,36,0.10), 0 2px 8px rgba(20,24,36,0.05);
+  --shadow-lg: 0 20px 60px rgba(20,24,36,0.13);
+  --font:      "Bricolage Grotesque", sans-serif;
+  --serif:     "Instrument Serif", serif;
+  --mono:      "JetBrains Mono", monospace;
+  --r:         10px;
+  --r2:        14px;
+  --r3:        18px;
+  --sidebar:   272px;
+}
+
+/* ── CURSOR ── */
+/* ── AURORA BACKGROUND ── */
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  color: var(--text1);
+  background: #f8f9ff;
+}
+
+/* Aurora layer */
+#aurora-bg {
+  position: fixed; inset: -10px; z-index: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
+    repeating-linear-gradient(100deg,
+      #93c5fd 10%, #a5b4fc 15%, #bfdbfe 20%, #ddd6fe 25%, #bae6fd 30%);
+  background-size: 300% 200%;
+  background-position: 50% 50%;
+  filter: blur(10px);
+  opacity: 0.55;
+  animation: aurora 30s linear infinite;
+  mask-image: radial-gradient(ellipse at 100% 0%, black 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 100% 0%, black 10%, transparent 70%);
+}
+#aurora-bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%),
+    repeating-linear-gradient(100deg,
+      #93c5fd 10%, #a5b4fc 15%, #bfdbfe 20%, #ddd6fe 25%, #bae6fd 30%);
+  background-size: 200% 100%;
+  background-attachment: fixed;
+  mix-blend-mode: difference;
+  animation: aurora 20s linear infinite;
+}
+@keyframes aurora {
+  from { background-position: 50% 50%, 50% 50%; }
+  to   { background-position: 350% 50%, 350% 50%; }
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(79,110,247,0.2); border-radius: 99px; }
+
+/* ── LAYOUT ── */
+#app { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 1; }
+
+/* ═══════════════
+   SIDEBAR
+═══════════════ */
+#sidebar {
+  width: var(--sidebar);
+  min-width: var(--sidebar);
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  box-shadow: 2px 0 20px rgba(20,24,36,0.06);
+  position: relative; z-index: 10;
+}
+
+.brand {
+  padding: 22px 18px 18px;
+  border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 11px;
+}
+.brand-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), #8b7cf8);
+  border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-style: italic;
+  font-size: 18px; color: #fff; font-weight: 300;
+  box-shadow: 0 4px 14px rgba(79,110,247,0.35);
+}
+.brand-name { font-size: 14.5px; font-weight: 600; color: var(--text1); letter-spacing: -0.2px; }
+.brand-sub  { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.sb-sec { padding: 14px 14px 6px; }
+.sb-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--text4);
+  margin-bottom: 8px; padding: 0 2px;
+}
+
+.btn-add {
+  width: 100%; padding: 10px 14px;
+  background: linear-gradient(135deg, var(--accent), #7c6cf8);
+  border: none; border-radius: var(--r);
+  color: #fff; font-family: var(--font); font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all .18s;
+  box-shadow: 0 4px 16px rgba(79,110,247,0.3);
+}
+.btn-add:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(79,110,247,0.42); }
+.btn-add:active { transform: none; }
+.btn-add svg { width: 13px; height: 13px; stroke: currentColor; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.pill {
+  padding: 4px 10px; border-radius: 99px;
+  border: 1px solid var(--border2);
+  background: var(--glass2);
+  color: var(--text3); font-family: var(--font); font-size: 11.5px; font-weight: 500;
+  backdrop-filter: blur(8px);
+  transition: all .12s;
+}
+.pill:hover { border-color: rgba(79,110,247,0.3); color: var(--text1); background: var(--glass); }
+.pill.active {
+  background: var(--accent); border-color: transparent;
+  color: #fff; box-shadow: 0 2px 8px rgba(79,110,247,0.3);
+}
+
+.sort-sel {
+  width: 100%; padding: 7px 11px; border-radius: var(--r);
+  background: var(--glass2); border: 1px solid var(--border2);
+  color: var(--text1); font-family: var(--font); font-size: 12px;
+  outline: none; backdrop-filter: blur(8px);
+  transition: border-color .12s;
+}
+.sort-sel:focus { border-color: rgba(79,110,247,0.4); }
+.sort-sel option { background: #eef0f8; }
+
+.sb-btn {
+  width: 100%; padding: 8px 11px; margin-bottom: 5px;
+  background: var(--glass2); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text2);
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+  backdrop-filter: blur(8px); transition: all .12s;
+}
+.sb-btn:hover { background: var(--glass); border-color: rgba(79,110,247,0.25); color: var(--text1); }
+.sb-btn svg { width: 13px; height: 13px; stroke: currentColor; opacity: .6; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.stat-card {
+  background: var(--glass2); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 11px; text-align: center;
+  backdrop-filter: blur(8px); transition: all .14s;
+}
+.stat-card:hover { background: var(--glass); border-color: rgba(79,110,247,0.2); }
+.stat-n { font-family: var(--serif); font-size: 24px; color: var(--text1); line-height: 1; }
+.stat-l { font-size: 10px; color: var(--text3); margin-top: 2px; text-transform: uppercase; letter-spacing: .4px; }
+.stat-n.indigo { color: var(--accent); }
+.stat-n.blue   { color: var(--blue); }
+.stat-n.amber  { color: var(--amber); }
+.stat-n.green  { color: var(--green); }
+
+/* ═══════════════
+   MAIN
+═══════════════ */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* LAMP HEADER */
+#lamp-header {
+  position: relative; flex-shrink: 0;
+  height: 108px;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  overflow: hidden;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 28px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 1px 0 rgba(79,110,247,0.08);
+}
+.lamp-l {
+  position: absolute; top: 0; right: 50%;
+  width: 300px; height: 108px;
+  background: conic-gradient(from 70deg at right top,
+    rgba(79,110,247,0.18) 0deg, transparent 28deg);
+  transform-origin: right top;
+  animation: lp 4s ease-in-out infinite alternate;
+}
+.lamp-r {
+  position: absolute; top: 0; left: 50%;
+  width: 300px; height: 108px;
+  background: conic-gradient(from 290deg at left top,
+    rgba(79,110,247,0.18) 0deg, transparent 28deg);
+  transform-origin: left top;
+  animation: lp 4s ease-in-out infinite alternate;
+}
+.lamp-glow {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 380px; height: 50px;
+  background: radial-gradient(ellipse, rgba(79,110,247,0.12) 0%, transparent 70%);
+  filter: blur(12px);
+  animation: lp 4s ease-in-out infinite alternate;
+}
+.lamp-line {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 340px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(79,110,247,0.4), transparent);
+  animation: lp 4s ease-in-out infinite alternate;
+}
+@keyframes lp { 0%{opacity:.7} 100%{opacity:1} }
+
+.header-left { position: relative; z-index: 5; }
+.header-title {
+  font-family: var(--serif); font-size: 26px; font-style: italic;
+  color: var(--text1); letter-spacing: -0.2px; line-height: 1.1;
+}
+.header-sub {
+  font-size: 11.5px; color: var(--text3);
+  font-family: var(--mono); margin-top: 3px;
+}
+
+.header-search { position: relative; z-index: 5; flex: 0 0 260px; }
+.header-search input {
+  width: 100%; padding: 8px 13px 8px 36px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 99px; color: var(--text1);
+  font-family: var(--font); font-size: 12.5px;
+  outline: none; transition: all .2s;
+  backdrop-filter: blur(8px);
+}
+.header-search input::placeholder { color: var(--text4); }
+.header-search input:focus {
+  border-color: rgba(79,110,247,0.45);
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
+}
+.s-ico {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--text3); pointer-events: none;
+}
+.s-ico svg { width: 13px; height: 13px; stroke: currentColor; }
+
+/* TABS */
+.tabs-bar {
+  padding: 0 28px;
+  display: flex; gap: 0;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+  flex-shrink: 0;
+}
+.tab-btn {
+  padding: 11px 16px; background: none; border: none;
+  color: var(--text3); font-family: var(--font); font-size: 12.5px; font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+  position: relative; transition: color .12s;
+}
+.tab-btn:hover { color: var(--text1); }
+.tab-btn.active { color: var(--text1); }
+.tab-btn.active::after {
+  content: ""; position: absolute; bottom: -1px; left: 0; right: 0;
+  height: 2px; background: var(--accent); border-radius: 99px 99px 0 0;
+}
+.tab-badge {
+  font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 99px;
+  background: var(--glass2); border: 1px solid var(--border2); color: var(--text3);
+}
+.tab-btn.active .tab-badge { background: var(--accent); border-color: transparent; color: #fff; }
+
+/* CONTENT */
+#content-area { flex: 1; overflow-y: auto; padding: 20px 28px 36px; }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 14px;
+}
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 20px; text-align: center;
+}
+.empty-state.hidden { display: none; }
+.empty-icon { font-size: 40px; margin-bottom: 14px; opacity: .35; }
+.empty-title { font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--text2); margin-bottom: 6px; }
+.empty-sub { font-size: 12.5px; color: var(--text3); }
+
+/* ═════════════════════════
+   HOLOGRAPHIC TASK CARD
+═════════════════════════ */
+.task-card {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow .2s, border-color .2s, transform .25s cubic-bezier(.23,1,.32,1);
+  box-shadow: var(--shadow-sm);
+  transform-style: preserve-3d;
+  will-change: transform;
+  animation: cardIn .3s ease both;
+  --x: 50%; --y: 50%; --bg-x: 50%; --bg-y: 50%;
+}
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(12px) scale(0.97); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.task-card:hover {
+  box-shadow: 0 16px 48px rgba(20,24,36,0.12), 0 4px 12px rgba(79,110,247,0.08);
+  border-color: rgba(255,255,255,0.9);
+}
+
+/* holographic shimmer */
+.task-card::before {
+  content: "";
+  position: absolute; inset: 0; border-radius: 16px; z-index: 2; pointer-events: none;
+  background: radial-gradient(
+    farthest-corner ellipse at var(--bg-x) var(--bg-y),
+    rgba(255,255,255,0.32) 0%,
+    rgba(180,200,255,0.14) 25%,
+    rgba(200,175,255,0.08) 50%,
+    rgba(175,230,210,0.06) 70%,
+    transparent 85%
+  );
+  opacity: 0; transition: opacity .25s; mix-blend-mode: overlay;
+}
+.task-card:hover::before { opacity: 1; }
+
+/* spotlight */
+.task-card::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(
+    110px circle at var(--x) var(--y),
+    rgba(255,255,255,0.18),
+    transparent 70%
+  );
+  opacity: 0; transition: opacity .2s;
+}
+.task-card:hover::after { opacity: 1; }
+
+/* client stripe */
+.task-card.basf     { border-top: 2px solid rgba(52,96,212,0.6); }
+.task-card.henkel   { border-top: 2px solid rgba(154,96,16,0.6); }
+.task-card.workitem { border-top: 2px solid rgba(31,122,82,0.6); }
+.task-card.other    { border-top: 2px solid rgba(79,110,247,0.6); }
+.task-card.hidden-card { opacity: .55; filter: grayscale(0.25); }
+
+.card-inner { position: relative; z-index: 3; padding: 15px 15px 13px; }
+
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.card-badges { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; flex: 1; min-width: 0; }
+
+.badge {
+  font-size: 10.5px; font-weight: 600; padding: 2px 8px;
+  border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+}
+.badge.id    { font-family: var(--mono); font-size: 10px; background: rgba(20,24,36,0.06); color: var(--text3); border: 1px solid var(--border2); border-radius: 5px; padding: 2px 7px; }
+.badge.bug   { background: var(--red-lt);   color: var(--red);   border: 1px solid rgba(176,40,40,.15); }
+.badge.cr    { background: var(--blue-lt);  color: var(--blue);  border: 1px solid rgba(52,96,212,.15); }
+.badge.wi    { background: var(--green-lt); color: var(--green); border: 1px solid rgba(31,122,82,.15); }
+.badge.other { background: rgba(79,110,247,.08); color: var(--accent); border: 1px solid rgba(79,110,247,.15); }
+
+.client-badge { font-size: 10.5px; font-weight: 600; padding: 2px 9px; border-radius: 99px; flex-shrink: 0; }
+.client-badge.basf     { background: var(--blue-lt);  color: var(--blue); }
+.client-badge.henkel   { background: var(--amber-lt); color: var(--amber); }
+.client-badge.workitem { background: var(--green-lt); color: var(--green); }
+.client-badge.other    { background: rgba(79,110,247,.08); color: var(--accent); }
+
+.status-pill {
+  font-size: 10.5px; font-weight: 500; padding: 2px 9px;
+  border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.status-pill::before { content:""; width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+.status-pill.new      { background: var(--blue-lt);  color: var(--blue);  border: 1px solid rgba(52,96,212,.15); }
+.status-pill.new::before      { background: var(--blue); }
+.status-pill.active   { background: var(--amber-lt); color: var(--amber); border: 1px solid rgba(154,96,16,.15); }
+.status-pill.active::before   { background: var(--amber); }
+.status-pill.released { background: var(--green-lt); color: var(--green); border: 1px solid rgba(31,122,82,.15); }
+.status-pill.released::before { background: var(--green); }
+.status-pill.closed   { background: rgba(20,24,36,0.05); color: var(--text3); border: 1px solid var(--border2); }
+.status-pill.closed::before   { background: var(--text3); }
+
+.card-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ca-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  border: 1px solid var(--border2); background: var(--glass2);
+  color: var(--text4); display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px); transition: all .12s;
+}
+.ca-btn svg { width: 12px; height: 12px; stroke: currentColor; }
+.ca-btn:hover { background: var(--glass); border-color: var(--border3); color: var(--text2); }
+.ca-btn.edit:hover  { color: var(--blue);   background: var(--blue-lt);  border-color: rgba(52,96,212,.3); }
+.ca-btn.hide:hover  { color: var(--amber);  background: var(--amber-lt); border-color: rgba(154,96,16,.3); }
+.ca-btn.show:hover  { color: var(--green);  background: var(--green-lt); border-color: rgba(31,122,82,.3); }
+.ca-btn.del:hover   { color: var(--red);    background: var(--red-lt);   border-color: rgba(176,40,40,.3); }
+
+.card-subject {
+  font-size: 13.5px; font-weight: 600; color: var(--text1);
+  line-height: 1.35; margin-bottom: 9px; letter-spacing: -0.1px;
+}
+.card-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 11px; }
+.chip {
+  font-size: 11px; color: var(--text3);
+  background: var(--glass2); border: 1px solid var(--border2);
+  padding: 2px 8px; border-radius: 5px;
+  display: flex; align-items: center; gap: 4px;
+  backdrop-filter: blur(6px);
+}
+.chip svg { width: 10px; height: 10px; stroke: currentColor; opacity: .6; }
+
+.card-expand-btn {
+  width: 100%; padding: 8px 0 2px;
+  border: none; background: none;
+  border-top: 1px solid var(--border2);
+  color: var(--text3); font-family: var(--font); font-size: 11.5px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: color .12s;
+}
+.card-expand-btn:hover { color: var(--accent); }
+.card-expand-btn svg { width: 11px; height: 11px; stroke: currentColor; transition: transform .2s; }
+.task-card.expanded .card-expand-btn svg { transform: rotate(180deg); }
+
+.card-body { display: none; border-top: 1px solid var(--border2); padding: 13px 0 2px; margin-top: 10px; }
+.task-card.expanded .card-body { display: block; animation: fadeSlide .18s ease; }
+@keyframes fadeSlide { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+
+.fields-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.field-lbl { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px; color: var(--text4); margin-bottom: 2px; }
+.field-val { font-size: 12.5px; color: var(--text1); }
+.field-val.empty { color: var(--text4); font-style: italic; }
+
+.card-divider { height: 1px; background: var(--border2); margin: 10px 0; }
+
+.notes-box {
+  background: rgba(79,110,247,0.06); border: 1px solid rgba(79,110,247,0.15);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 12.5px; color: var(--text2); line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word;
+}
+.notes-empty {
+  background: var(--glass2); border: 1px dashed var(--border2);
+  border-radius: 8px; padding: 9px 12px;
+  font-size: 12px; color: var(--text4); font-style: italic;
+}
+.done-bar { margin-top: 10px; }
+.done-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.done-track { height: 4px; background: rgba(20,24,36,0.08); border-radius: 99px; overflow: hidden; }
+.done-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; }
+.card-ts { font-size: 10px; color: var(--text4); font-family: var(--mono); margin-top: 9px; }
+
+.hidden-banner {
+  background: var(--glass2); border: 1px dashed var(--border2);
+  backdrop-filter: blur(8px);
+  border-radius: var(--r2); padding: 12px 16px;
+  text-align: center; color: var(--text3); font-size: 12.5px; margin-bottom: 12px;
+}
+
+/* ═══════════════
+   MODALS
+═══════════════ */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10,12,22,0.45); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; animation: oin .15s ease;
+}
+@keyframes oin { from{opacity:0} to{opacity:1} }
+.overlay.hidden { display: none; }
+
+.modal {
+  background: rgba(240,242,250,0.88);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-height: 90vh; overflow-y: auto;
+  animation: min .2s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes min { from{opacity:0;transform:scale(.95) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal.sm { max-width: 420px; }
+.modal.lg { max-width: 660px; }
+
+.modal-head {
+  padding: 20px 22px 16px; border-bottom: 1px solid var(--border2);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-head h2 { font-family: var(--serif); font-size: 17px; font-style: italic; color: var(--text1); }
+.modal-head .sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.modal-x {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--glass2); border: 1px solid var(--border2);
+  color: var(--text3); display: flex; align-items: center; justify-content: center;
+  transition: all .12s; flex-shrink: 0;
+}
+.modal-x:hover { background: var(--glass); color: var(--text1); }
+.modal-x svg { width: 12px; height: 12px; stroke: currentColor; }
+
+.modal-body { padding: 18px 22px 22px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-full { grid-column: 1 / -1; }
+
+label { display: flex; flex-direction: column; gap: 4px; }
+.lbl { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); }
+.req { color: var(--accent); }
+
+input[type=text], input[type=number], input[type=date], select, textarea {
+  background: var(--glass2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 8px 11px;
+  color: var(--text1); font-family: var(--font); font-size: 12.5px;
+  outline: none; transition: all .12s; width: 100%;
+  backdrop-filter: blur(6px);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(79,110,247,0.5); background: rgba(255,255,255,0.7);
+  box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
+}
+input::placeholder, textarea::placeholder { color: var(--text4); }
+textarea { resize: vertical; min-height: 72px; }
+select option { background: #edf0f8; }
+
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+.btn-cancel {
+  padding: 8px 16px; border-radius: 8px;
+  background: var(--glass2); border: 1px solid var(--border2);
+  color: var(--text2); font-family: var(--font); font-size: 12.5px; font-weight: 500;
+  transition: all .12s;
+}
+.btn-cancel:hover { background: var(--glass); color: var(--text1); }
+.btn-save {
+  padding: 8px 20px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #7c6cf8);
+  border: none; color: #fff;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  transition: all .15s; box-shadow: 0 3px 12px rgba(79,110,247,0.3);
+}
+.btn-save:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(79,110,247,0.42); }
+.btn-delete {
+  padding: 8px 20px; border-radius: 8px;
+  background: var(--red-lt); border: 1px solid rgba(176,40,40,.2);
+  color: var(--red); font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  transition: all .12s;
+}
+.btn-delete:hover { background: rgba(176,40,40,0.15); }
+
+.del-info {
+  background: rgba(176,40,40,0.05); border: 1px solid rgba(176,40,40,.12);
+  border-radius: 9px; padding: 11px 13px;
+  font-size: 12.5px; color: var(--text2); line-height: 1.65; margin-top: 8px;
+}
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(20,24,36,0.92); color: #fff;
+  backdrop-filter: blur(12px);
+  padding: 9px 20px; border-radius: 99px;
+  font-size: 12.5px; font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: var(--shadow-lg);
+  opacity: 0; pointer-events: none;
+  transition: all .22s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999; white-space: nowrap;
+}
+#toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+#toast.success { background: rgba(31,122,82,0.9); }
+#toast.error   { background: rgba(176,40,40,0.9); }
+</style>
 </head>
 <body>
 
-<!-- ═══ ADD / EDIT MODAL ═══ -->
+<!-- Aurora background -->
+<div id="aurora-bg"></div>
+
+<!-- ADD/EDIT MODAL -->
 <div id="task-overlay" class="overlay hidden" onclick="overlayClose(event,'task-overlay')">
   <div class="modal lg">
     <div class="modal-head">
-      <div>
-        <h2 id="modal-title">Add New Task</h2>
-        <div id="modal-sub" class="sub">Fill in the details from your Redmine tracker</div>
-      </div>
-      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      <div><h2 id="modal-title">Add New Task</h2><div id="modal-sub" class="sub">Fill in the details from Redmine</div></div>
+      <button class="modal-x" onclick="closeTaskModal()"><svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
-        <label>
-          <span class="flbl">Tracker ID<span class="req">*</span></span>
-          <input id="f-id" type="number" placeholder="e.g. 68898" min="1"/>
-        </label>
-        <label>
-          <span class="flbl">Tracker Type</span>
-          <select id="f-tracker-type">
-            <option value="">— Select —</option>
-            <option>Bug</option><option>CR</option><option>WorkItem</option><option>Feature</option><option>Support</option>
-          </select>
-        </label>
-        <div class="form-full">
-          <label>
-            <span class="flbl">Subject / Description<span class="req">*</span></span>
-            <input id="f-subject" type="text" placeholder="What is this task about?"/>
-          </label>
-        </div>
-        <label>
-          <span class="flbl">Client / Project<span class="req">*</span></span>
-          <select id="f-client">
-            <option value="">— Select —</option>
-            <option>BASF</option><option>Henkel</option><option>WorkItem</option><option>Other</option>
-          </select>
-        </label>
-        <label>
-          <span class="flbl">Module</span>
-          <input id="f-module" type="text" placeholder="e.g. Dispatch, Manufacture"/>
-        </label>
-        <label>
-          <span class="flbl">Plant / Site</span>
-          <input id="f-plant" type="text" placeholder="e.g. Kunpeng, Rancho"/>
-        </label>
-        <div class="form-full">
-          <label>
-            <span class="flbl">Status<span class="req">*</span></span>
-            <input id="f-status" type="text" placeholder="e.g. New, Released to Production…" list="status-list"/>
-            <datalist id="status-list">
-              <option>New</option><option>In Progress</option><option>New - Design phase</option>
-              <option>Local testing Completed</option><option>Waiting for PO</option>
-              <option>PO received</option><option>Released to Production</option>
-              <option>Closed</option><option>Rejected</option><option>Competed</option>
-            </datalist>
-          </label>
-        </div>
-        <label>
-          <span class="flbl">Priority</span>
-          <select id="f-priority">
-            <option value="">— Select —</option>
-            <option>Low</option><option>Normal</option><option>High</option><option>Urgent</option><option>Immediate</option>
-          </select>
-        </label>
-        <label>
-          <span class="flbl">Assigned To</span>
-          <input id="f-assigned" type="text" placeholder="Developer name"/>
-        </label>
-        <label>
-          <span class="flbl">Author / Reporter</span>
-          <input id="f-author" type="text" placeholder="Who raised this?"/>
-        </label>
-        <label>
-          <span class="flbl">Version / Sprint</span>
-          <input id="f-version" type="text" placeholder="e.g. v2.4.1"/>
-        </label>
-        <label><span class="flbl">Start Date</span><input id="f-start" type="date"/></label>
-        <label><span class="flbl">Due Date</span><input id="f-due" type="date"/></label>
-        <label>
-          <span class="flbl">Done %</span>
-          <input id="f-done" type="number" min="0" max="100" placeholder="0–100"/>
-        </label>
-        <label>
-          <span class="flbl">Parent Tracker ID</span>
-          <input id="f-parent" type="number" placeholder="e.g. 4800"/>
-        </label>
-        <label>
-          <span class="flbl">Child / Related IDs</span>
-          <input id="f-children" type="text" placeholder="Comma separated: 4822, 4823"/>
-        </label>
-        <div class="form-full">
-          <label>
-            <span class="flbl">Comments / My Notes</span>
-            <textarea id="f-note" rows="3" placeholder="Post-demo notes, SOW details, client comments…"></textarea>
-          </label>
-        </div>
+        <label><span class="lbl">Tracker ID <span class="req">*</span></span><input id="f-id" type="number" placeholder="e.g. 68898"/></label>
+        <label><span class="lbl">Type</span><select id="f-tracker-type"><option value="">— Select —</option><option>Bug</option><option>CR</option><option>WorkItem</option><option>Feature</option><option>Support</option></select></label>
+        <div class="form-full"><label><span class="lbl">Subject <span class="req">*</span></span><input id="f-subject" type="text" placeholder="What is this task about?"/></label></div>
+        <label><span class="lbl">Client <span class="req">*</span></span><select id="f-client"><option value="">— Select —</option><option>BASF</option><option>Henkel</option><option>WorkItem</option><option>Other</option></select></label>
+        <label><span class="lbl">Module</span><input id="f-module" type="text" placeholder="e.g. Dispatch"/></label>
+        <label><span class="lbl">Plant / Site</span><input id="f-plant" type="text" placeholder="e.g. Kunpeng"/></label>
+        <div class="form-full"><label><span class="lbl">Status <span class="req">*</span></span><input id="f-status" type="text" list="status-list" placeholder="e.g. New, Released to Production…"/><datalist id="status-list"><option>New</option><option>In Progress</option><option>New - Design phase</option><option>Local testing Completed</option><option>Waiting for PO</option><option>PO received</option><option>Released to Production</option><option>Closed</option></datalist></label></div>
+        <label><span class="lbl">Priority</span><select id="f-priority"><option value="">— Select —</option><option>Low</option><option>Normal</option><option>High</option><option>Urgent</option></select></label>
+        <label><span class="lbl">Assigned To</span><input id="f-assigned" type="text" placeholder="Developer name"/></label>
+        <label><span class="lbl">Author</span><input id="f-author" type="text" placeholder="Who raised this?"/></label>
+        <label><span class="lbl">Version</span><input id="f-version" type="text" placeholder="e.g. v2.4"/></label>
+        <label><span class="lbl">Start Date</span><input id="f-start" type="date"/></label>
+        <label><span class="lbl">Due Date</span><input id="f-due" type="date"/></label>
+        <label><span class="lbl">Done %</span><input id="f-done" type="number" min="0" max="100" placeholder="0–100"/></label>
+        <label><span class="lbl">Parent ID</span><input id="f-parent" type="number" placeholder="Parent tracker ID"/></label>
+        <label><span class="lbl">Child IDs</span><input id="f-children" type="text" placeholder="Comma separated"/></label>
+        <div class="form-full"><label><span class="lbl">Comments / Notes</span><textarea id="f-note" rows="3" placeholder="Notes, SOW details, client comments…"></textarea></label></div>
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeTaskModal()">Cancel</button>
-        <button class="btn-save"   onclick="saveTask()">Save Task</button>
+        <button class="btn-save" onclick="saveTask()">Save Task</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ DELETE MODAL ═══ -->
+<!-- DELETE MODAL -->
 <div id="delete-overlay" class="overlay hidden" onclick="overlayClose(event,'delete-overlay')">
   <div class="modal sm">
     <div class="modal-head">
-      <div>
-        <h2>Remove Task</h2>
-        <div class="sub">Local tracker only — Redmine is not affected</div>
-      </div>
-      <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+      <div><h2>Remove Task</h2><div class="sub">From your local tracker only</div></div>
+      <button class="modal-x" onclick="closeDeleteModal()"><svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg></button>
     </div>
     <div class="modal-body">
-      <p style="color:var(--text2);font-size:13.5px;margin-bottom:10px">Remove <strong id="delete-id-label"></strong> from your tracker?</p>
-      <div style="background:var(--red-lt);border:1px solid var(--red-mid);border-radius:8px;padding:11px 13px;font-size:12.5px;color:#991b1b;line-height:1.7">
-        ⚠ <strong>This app has zero connection to Redmine.</strong><br>
-        Nothing changes in Redmine — only your personal tracker is updated.<br>
-        Your Excel backup keeps all data safe if you export regularly.
+      <p style="font-size:13px;color:var(--text2);margin-bottom:6px">Removing <strong id="delete-id-label"></strong></p>
+      <div class="del-info">
+        <strong>⚠ Zero connection to Redmine.</strong><br>
+        This app never contacts Redmine — no API, no sync, nothing changes there.<br>
+        Removing only affects your local tracker. Export to Excel regularly as backup.
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
@@ -140,117 +674,333 @@
   </div>
 </div>
 
-<!-- ═══ APP SHELL ═══ -->
+<!-- APP -->
 <div id="app">
-
   <aside id="sidebar">
     <div class="brand">
       <div class="brand-icon">T</div>
-      <div>
-        <div class="brand-title">Task Tracker</div>
-        <div class="brand-sub">Redmine Personal Log</div>
-      </div>
+      <div><div class="brand-name">Task Tracker</div><div class="brand-sub">Redmine Personal Log</div></div>
     </div>
-
-    <div class="sb-section">
-      <button class="btn-add" onclick="openAddModal()">＋ Add New Task</button>
+    <div class="sb-sec">
+      <button class="btn-add" onclick="openAddModal()">
+        <svg viewBox="0 0 13 13"><line x1="6.5" y1="1" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="12" y2="6.5"/></svg>
+        Add New Task
+      </button>
     </div>
-
-    <div class="sb-section">
-      <div class="sb-label">Client</div>
+    <div class="sb-sec"><div class="sb-lbl">Client</div>
       <div class="pills" id="client-pills">
         <button class="pill active" onclick="setClient('all',this)">All</button>
-        <button class="pill"        onclick="setClient('BASF',this)">BASF</button>
-        <button class="pill ph"     onclick="setClient('Henkel',this)">Henkel</button>
-        <button class="pill pw"     onclick="setClient('WorkItem',this)">WorkItem</button>
+        <button class="pill" onclick="setClient('BASF',this)">BASF</button>
+        <button class="pill" onclick="setClient('Henkel',this)">Henkel</button>
+        <button class="pill" onclick="setClient('WorkItem',this)">WorkItem</button>
       </div>
     </div>
-
-    <div class="sb-section">
-      <div class="sb-label">Status</div>
+    <div class="sb-sec"><div class="sb-lbl">Status</div>
       <div class="pills" id="status-pills">
         <button class="pill active" onclick="setFilter('all',this)">All</button>
-        <button class="pill"        onclick="setFilter('new',this)">New</button>
-        <button class="pill"        onclick="setFilter('active',this)">Active</button>
-        <button class="pill"        onclick="setFilter('released',this)">Released</button>
-        <button class="pill"        onclick="setFilter('closed',this)">Closed</button>
+        <button class="pill" onclick="setFilter('new',this)">New</button>
+        <button class="pill" onclick="setFilter('active',this)">Active</button>
+        <button class="pill" onclick="setFilter('released',this)">Released</button>
+        <button class="pill" onclick="setFilter('closed',this)">Closed</button>
       </div>
     </div>
-
-    <div class="sb-section">
-      <div class="sb-label">Type</div>
+    <div class="sb-sec"><div class="sb-lbl">Type</div>
       <div class="pills" id="type-pills">
         <button class="pill active" onclick="setType('all',this)">All</button>
-        <button class="pill"        onclick="setType('Bug',this)">Bug</button>
-        <button class="pill"        onclick="setType('CR',this)">CR</button>
-        <button class="pill pw"     onclick="setType('WorkItem',this)">WorkItem</button>
+        <button class="pill" onclick="setType('Bug',this)">Bug</button>
+        <button class="pill" onclick="setType('CR',this)">CR</button>
+        <button class="pill" onclick="setType('WorkItem',this)">WorkItem</button>
       </div>
     </div>
-
-    <div class="sb-section">
-      <div class="sb-label">Sort By</div>
+    <div class="sb-sec"><div class="sb-lbl">Sort By</div>
       <select class="sort-sel" onchange="setSort(this.value)">
         <option value="added_desc">Recently Added</option>
         <option value="added_asc">Oldest First</option>
         <option value="id_asc">Tracker ID ↑</option>
         <option value="id_desc">Tracker ID ↓</option>
-        <option value="client">Client</option>
+        <option value="client">By Client</option>
       </select>
     </div>
-
-    <div class="sb-section">
-      <div class="sb-label">Actions</div>
-      <button class="sb-btn" onclick="exportExcel()">⬇ Export to Excel</button>
+    <div class="sb-sec"><div class="sb-lbl">Actions</div>
+      <button class="sb-btn" onclick="exportExcel()">
+        <svg viewBox="0 0 13 13"><polyline points="6.5,1 6.5,9"/><polyline points="3.5,6 6.5,9 9.5,6"/><rect x="1" y="10" width="11" height="2" rx="1"/></svg>
+        Export to Excel
+      </button>
       <button class="sb-btn" onclick="importExcel()">
-        ⬆ Import from Excel
+        <svg viewBox="0 0 13 13"><polyline points="6.5,9 6.5,1"/><polyline points="3.5,4 6.5,1 9.5,4"/><rect x="1" y="10" width="11" height="2" rx="1"/></svg>
+        Import from Excel
         <input type="file" id="import-input" accept=".xlsx" style="display:none" onchange="handleImport(event)"/>
       </button>
     </div>
-
-    <div class="sb-section" style="padding-bottom:24px">
-      <div class="sb-label">Summary</div>
+    <div class="sb-sec" style="padding-bottom:20px"><div class="sb-lbl">Summary</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-num"     id="s-total">0</div><div class="stat-lbl">Total</div></div>
-        <div class="stat-card"><div class="stat-num blue" id="s-new">0</div><div class="stat-lbl">New</div></div>
-        <div class="stat-card"><div class="stat-num amber"id="s-active">0</div><div class="stat-lbl">Active</div></div>
-        <div class="stat-card"><div class="stat-num green"id="s-done">0</div><div class="stat-lbl">Released</div></div>
+        <div class="stat-card"><div class="stat-n" id="s-total">0</div><div class="stat-l">Total</div></div>
+        <div class="stat-card"><div class="stat-n blue" id="s-new">0</div><div class="stat-l">New</div></div>
+        <div class="stat-card"><div class="stat-n amber" id="s-active">0</div><div class="stat-l">Active</div></div>
+        <div class="stat-card"><div class="stat-n green" id="s-done">0</div><div class="stat-l">Released</div></div>
       </div>
     </div>
   </aside>
 
   <main id="main">
-    <div class="topbar">
-      <div>
-        <h1>My Assigned Tasks</h1>
-        <div class="sub" id="main-sub">Loading…</div>
+    <div id="lamp-header">
+      <div class="lamp-l"></div><div class="lamp-r"></div>
+      <div class="lamp-glow"></div><div class="lamp-line"></div>
+      <div class="header-left">
+        <div class="header-title">My Assigned Tasks</div>
+        <div class="header-sub" id="main-sub">Loading…</div>
       </div>
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input id="search-input" type="text" placeholder="Search ID, title, module, plant…" oninput="renderCards()"/>
+      <div class="header-search">
+        <span class="s-ico"><svg viewBox="0 0 13 13"><circle cx="5.5" cy="5.5" r="4"/><line x1="8.5" y1="8.5" x2="12" y2="12"/></svg></span>
+        <input id="search-input" type="text" placeholder="Search ID, title, module…" oninput="renderCards()"/>
       </div>
     </div>
-
     <div class="tabs-bar">
-      <button class="tab-btn active" id="tab-active" onclick="switchTab('active',this)">
-        Active Tasks <span class="tab-badge" id="tab-active-count">0</span>
-      </button>
-      <button class="tab-btn htab" id="tab-hidden" onclick="switchTab('hidden',this)">
-        Hidden <span class="tab-badge" id="tab-hidden-count">0</span>
-      </button>
+      <button class="tab-btn active" onclick="switchTab('active',this)">Active Tasks <span class="tab-badge" id="tab-active-count">0</span></button>
+      <button class="tab-btn" onclick="switchTab('hidden',this)">Hidden <span class="tab-badge" id="tab-hidden-count">0</span></button>
     </div>
-
     <div id="content-area">
       <div id="empty-state" class="empty-state hidden">
         <div class="empty-icon">📋</div>
         <div class="empty-title">No tasks found</div>
         <div class="empty-sub">Try a different filter or add a new task</div>
       </div>
-      <div id="cards-container"></div>
+      <div id="cards-container" class="cards-grid"></div>
     </div>
   </main>
 </div>
-
 <div id="toast"></div>
-<script src="js/app.js"></script>
+
+<script>
+const SEED=[{"id": "19cde2263484a15", "client": "BASF", "trackerId": 68898, "trackerType": "Bug", "module": "", "plant": "", "subject": "Loading Issue in Truck Management screen", "status": "Released to Production", "note": "", "priority": "", "project": "BASF", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348b212", "client": "BASF", "trackerId": 17343, "trackerType": "CR", "module": "", "plant": "", "subject": "Handling PO Visibility in SFS Based on Delivery Order Creation in SAP ( RFG)", "status": "New", "note": "", "priority": "", "project": "BASF", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263483f2f", "client": "Henkel", "trackerId": 68925, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Issue during stock movement to dispatch gate", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348942e", "client": "Henkel", "trackerId": 67960, "trackerType": "CR", "module": "Goods Receipt", "plant": "", "subject": "Itapevi GR Workflow changes", "status": "Local testing Completed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Goods Receipt", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348656b", "client": "Henkel", "trackerId": 67124, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Dispatch shuttle process enhancement with Spanish translations", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348d08b", "client": "Henkel", "trackerId": 69974, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Delivery order unit issue in Stock transfer flow", "status": "Released to henkel latam production server", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263481e2a", "client": "Henkel", "trackerId": 70044, "trackerType": "Bug", "module": "Dispatch", "plant": "", "subject": "Dispatch go-live issue fix", "status": "Released to 203", "note": "Awaiting confirmation from client", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde22634828ce", "client": "Henkel", "trackerId": 68278, "trackerType": "CR", "module": "Dispatch", "plant": "", "subject": "New enhancement to dispatch shuttle process", "status": "Closed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Dispatch", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348f70", "client": "Henkel", "trackerId": 80449, "trackerType": "CR", "module": "Manufacture", "plant": "Kunpeng", "subject": "Enable Re-Creation of Failed Staging Order via Mobile \u201cRequest Replenish\u201d", "status": "New", "note": "when staging order for issue addition and request replenishment is failed, user can click request replenish on mobile, system can pop up message and re create instead of creating on staging order web page", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348dcf7", "client": "Henkel", "trackerId": 80393, "trackerType": "CR", "module": "Manufacture", "plant": "Rancho", "subject": "Display Gross & Tare Weight with Pallet Label Information", "status": "Waiting for PO", "note": "SOW sent ", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263488a9f", "client": "Henkel", "trackerId": 80399, "trackerType": "CR", "module": "Manufacture", "plant": "WGQ", "subject": "Implementation of Weighing Scale Feature for Gross Weight Capture During Bulk FG Confirmation", "status": "PO received - assigned to developer ( Narendra)", "note": "SOW sent ", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263481ce3", "client": "Henkel", "trackerId": 78023, "trackerType": "CR", "module": "Manufacture", "plant": "Rancho", "subject": "Enhancement to Capture Manual Tare Weight During Bulk FG Confirmation", "status": "New - rework on design ( savita ma'am comments)", "note": "Design shared - effort 04", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348e6a7", "client": "Henkel", "trackerId": 79173, "trackerType": "CR", "module": "Staging", "plant": "Kunpeng", "subject": "\tSend an email notification in case of failure in staging order creation or pallet transfer", "status": "New - Design phase", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde2263484ee9", "client": "Henkel", "trackerId": 79174, "trackerType": "CR", "module": "Manufacture", "plant": "Kunpeng", "subject": "DG dashboard enhancements", "status": "New - Design phase", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348d484", "client": "Henkel", "trackerId": 81245, "trackerType": "CR", "module": "Staging", "plant": "Kunpeng", "subject": "Send process order number to swisslog when request replenishment", "status": "Need inputs from chythra ma'am ", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348ed52", "client": "Henkel", "trackerId": 81237, "trackerType": "Bug", "module": "Staging", "plant": "Kunpeng", "subject": "process order log has no reservation log", "status": "New", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Staging", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348b5bb", "client": "Henkel", "trackerId": 62821, "trackerType": "CR", "module": "Manufacture", "plant": "All", "subject": "Batch Tracebility ", "status": "Competed", "note": "", "priority": "", "project": "Henkel", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "Manufacture", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}, {"id": "19cde226348f11c", "client": "WorkItem", "trackerId": 71122, "trackerType": "WorkItem", "module": "", "plant": "", "subject": "Refinished goods dispatch - approach and Document", "status": "Document sent to customer and received the approval.", "note": "", "priority": "", "project": "WorkItem", "assignedTo": "", "author": "", "startDate": "", "dueDate": "", "donePct": null, "version": "", "parentId": "", "childIds": "", "relatedIds": "", "category": "", "description": "", "addedAt": "2026-03-11T00:00:00.000Z", "updatedAt": "2026-03-11T00:00:00.000Z"}];
+var S={tasks:[],client:"all",status:"all",type:"all",sort:"added_desc",tab:"active"};
+var editId=null,delId=null;
+
+function save(){localStorage.setItem("rtt_v7",JSON.stringify(S.tasks));}
+function load(){
+  try{var r=localStorage.getItem("rtt_v7");if(r){S.tasks=JSON.parse(r);return;}}catch(e){}
+  S.tasks=SEED.map(function(t){return Object.assign({},t,{hidden:false});});save();
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+function grp(s){
+  s=(s||"").toLowerCase();
+  if(s.indexOf("new")>=0||s==="")return"new";
+  if(s.indexOf("progress")>=0||s.indexOf("design")>=0||s.indexOf("testing")>=0||
+     s.indexOf("waiting")>=0||s.indexOf("po received")>=0||s.indexOf("assigned")>=0||s.indexOf("inputs")>=0)return"active";
+  if(s.indexOf("released")>=0||s.indexOf("production")>=0||s.indexOf("competed")>=0||
+     s.indexOf("completed")>=0||s.indexOf("approval")>=0||s.indexOf("closed")>=0)return"released";
+  if(s.indexOf("reject")>=0||s.indexOf("cancel")>=0)return"closed";
+  return"active";
+}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmtD(d){if(!d)return"";try{return new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});}catch(e){return d;}}
+function fmtDT(d){if(!d)return"";try{return new Date(d).toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}catch(e){return d;}}
+
+/* ── MODAL ── */
+function openAddModal(){editId=null;clearForm();document.getElementById("modal-title").textContent="Add New Task";document.getElementById("modal-sub").textContent="Fill in the details from Redmine";document.getElementById("task-overlay").classList.remove("hidden");document.getElementById("f-id").focus();}
+function openEditModal(id){var t=findTask(id);if(!t)return;editId=id;fillForm(t);document.getElementById("modal-title").textContent="Edit #"+t.trackerId;document.getElementById("modal-sub").textContent=t.subject;document.getElementById("task-overlay").classList.remove("hidden");}
+function closeTaskModal(){document.getElementById("task-overlay").classList.add("hidden");editId=null;}
+function clearForm(){["f-id","f-subject","f-module","f-plant","f-status","f-assigned","f-author","f-start","f-due","f-done","f-version","f-parent","f-children","f-note"].forEach(function(id){var el=document.getElementById(id);if(el)el.value="";});document.getElementById("f-client").value="";document.getElementById("f-tracker-type").value="";document.getElementById("f-priority").value="";}
+function fillForm(t){function sv(id,v){var el=document.getElementById(id);if(el)el.value=v||"";}sv("f-id",t.trackerId);sv("f-subject",t.subject);sv("f-status",t.status);sv("f-module",t.module);sv("f-plant",t.plant);sv("f-assigned",t.assignedTo);sv("f-author",t.author);sv("f-start",t.startDate);sv("f-due",t.dueDate);sv("f-done",t.donePct!=null?t.donePct:"");sv("f-version",t.version);sv("f-parent",t.parentId);sv("f-children",t.childIds);sv("f-note",t.note);document.getElementById("f-client").value=t.client||"";document.getElementById("f-tracker-type").value=t.trackerType||"";document.getElementById("f-priority").value=t.priority||"";}
+function findTask(id){for(var i=0;i<S.tasks.length;i++){if(S.tasks[i].id===id)return S.tasks[i];}return null;}
+
+function saveTask(){
+  var tid=parseInt(document.getElementById("f-id").value.trim(),10);
+  var subj=document.getElementById("f-subject").value.trim();
+  var stat=document.getElementById("f-status").value.trim();
+  var cli=document.getElementById("f-client").value;
+  if(!tid||isNaN(tid)){toast("Enter a valid Tracker ID.","error");return;}
+  if(!subj){toast("Subject is required.","error");return;}
+  if(!stat){toast("Status is required.","error");return;}
+  if(!cli){toast("Select a Client.","error");return;}
+  if(!editId){for(var ci=0;ci<S.tasks.length;ci++){if(String(S.tasks[ci].trackerId)===String(tid)){toast("Tracker #"+tid+" already exists.","error");return;}}}
+  var dp=document.getElementById("f-done").value;
+  var data={trackerId:tid,subject:subj,status:stat,client:cli,trackerType:document.getElementById("f-tracker-type").value,module:document.getElementById("f-module").value.trim(),plant:document.getElementById("f-plant").value.trim(),priority:document.getElementById("f-priority").value,assignedTo:document.getElementById("f-assigned").value.trim(),author:document.getElementById("f-author").value.trim(),startDate:document.getElementById("f-start").value,dueDate:document.getElementById("f-due").value,donePct:dp!==""?parseInt(dp,10):null,version:document.getElementById("f-version").value.trim(),parentId:document.getElementById("f-parent").value.trim(),childIds:document.getElementById("f-children").value.trim(),note:document.getElementById("f-note").value.trim(),project:cli};
+  if(editId){for(var ei=0;ei<S.tasks.length;ei++){if(S.tasks[ei].id===editId){S.tasks[ei]=Object.assign({},S.tasks[ei],data,{updatedAt:new Date().toISOString()});break;}}toast("Task updated ✓","success");}
+  else{data.id=uid();data.addedAt=new Date().toISOString();data.updatedAt=data.addedAt;data.hidden=false;S.tasks.unshift(data);toast("Task #"+tid+" added ✓","success");}
+  save();closeTaskModal();renderCards();updateStats();
+}
+
+function askDelete(id){delId=id;var t=findTask(id);document.getElementById("delete-id-label").textContent=t?"#"+t.trackerId+" — "+t.subject:"#"+id;document.getElementById("delete-overlay").classList.remove("hidden");}
+function closeDeleteModal(){document.getElementById("delete-overlay").classList.add("hidden");delId=null;}
+function confirmDelete(){var nl=[];for(var i=0;i<S.tasks.length;i++){if(S.tasks[i].id!==delId)nl.push(S.tasks[i]);}S.tasks=nl;save();closeDeleteModal();renderCards();updateStats();toast("Task removed.","");}
+
+function hideTask(id){var t=findTask(id);if(!t)return;t.hidden=true;save();renderCards();updateStats();toast("Task hidden. See Hidden tab.","");}
+function unhideTask(id){var t=findTask(id);if(!t)return;t.hidden=false;save();renderCards();updateStats();toast("Task restored ✓","success");}
+
+function switchTab(tab,btn){S.tab=tab;document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});btn.classList.add("active");renderCards();}
+function setClient(v,b){S.client=v;apill("#client-pills",b);renderCards();}
+function setFilter(v,b){S.status=v;apill("#status-pills",b);renderCards();}
+function setType(v,b)  {S.type=v;  apill("#type-pills",b);  renderCards();}
+function setSort(v)    {S.sort=v;  renderCards();}
+function apill(sel,btn){document.querySelectorAll(sel+" .pill").forEach(function(p){p.classList.remove("active");});btn.classList.add("active");}
+
+function getList(){
+  var isH=S.tab==="hidden";
+  var r=S.tasks.filter(function(t){return isH?t.hidden===true:!t.hidden;});
+  var q=(document.getElementById("search-input")||{}).value;
+  q=(q||"").toLowerCase().trim();
+  if(q){r=r.filter(function(t){return String(t.trackerId).indexOf(q)>=0||(t.subject||"").toLowerCase().indexOf(q)>=0||(t.client||"").toLowerCase().indexOf(q)>=0||(t.module||"").toLowerCase().indexOf(q)>=0||(t.plant||"").toLowerCase().indexOf(q)>=0||(t.status||"").toLowerCase().indexOf(q)>=0||(t.trackerType||"").toLowerCase().indexOf(q)>=0||(t.note||"").toLowerCase().indexOf(q)>=0;});}
+  if(S.client!=="all")r=r.filter(function(t){return t.client===S.client;});
+  if(S.status!=="all")r=r.filter(function(t){return grp(t.status)===S.status;});
+  if(S.type!=="all")  r=r.filter(function(t){return t.trackerType===S.type;});
+  r.sort(function(a,b){if(S.sort==="added_asc")return new Date(a.addedAt)-new Date(b.addedAt);if(S.sort==="id_asc")return a.trackerId-b.trackerId;if(S.sort==="id_desc")return b.trackerId-a.trackerId;if(S.sort==="client")return(a.client||"").localeCompare(b.client||"");return new Date(b.addedAt)-new Date(a.addedAt);});
+  return r;
+}
+
+function renderCards(){
+  var container=document.getElementById("cards-container");
+  var emptyEl=document.getElementById("empty-state");
+  var list=getList();
+  var ac=S.tasks.filter(function(t){return!t.hidden;}).length;
+  var hc=S.tasks.filter(function(t){return t.hidden===true;}).length;
+  document.getElementById("tab-active-count").textContent=ac;
+  document.getElementById("tab-hidden-count").textContent=hc;
+  if(list.length===0){emptyEl.classList.remove("hidden");container.innerHTML="";}
+  else{
+    emptyEl.classList.add("hidden");
+    var html="";
+    if(S.tab==="hidden")html+='<div class="hidden-banner">👁 These tasks are hidden from your main view. Click the eye icon on any card to restore it.</div>';
+    for(var i=0;i<list.length;i++)html+=buildCard(list[i],i);
+    container.innerHTML=html;
+    attachHolo();
+  }
+  var sub=document.getElementById("main-sub");
+  if(sub)sub.textContent="Showing "+list.length+" of "+S.tasks.length+" tasks";
+}
+
+function attachHolo(){
+  document.querySelectorAll(".task-card").forEach(function(card){
+    card.addEventListener("mousemove",function(e){
+      var rect=card.getBoundingClientRect();
+      var x=e.clientX-rect.left,y=e.clientY-rect.top;
+      var cx=rect.width/2,cy=rect.height/2;
+      var rx=(y-cy)/16,ry=(cx-x)/16;
+      card.style.setProperty("--x",x+"px");
+      card.style.setProperty("--y",y+"px");
+      card.style.setProperty("--bg-x",(x/rect.width*100)+"%");
+      card.style.setProperty("--bg-y",(y/rect.height*100)+"%");
+      card.style.transform="perspective(900px) rotateX("+rx+"deg) rotateY("+ry+"deg) scale(1.012)";
+    });
+    card.addEventListener("mouseleave",function(){
+      card.style.transform="perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)";
+      card.style.setProperty("--bg-x","50%");card.style.setProperty("--bg-y","50%");
+    });
+  });
+}
+
+function buildCard(t,idx){
+  var g=grp(t.status);
+  var cCls=t.client==="BASF"?"basf":t.client==="Henkel"?"henkel":t.client==="WorkItem"?"workitem":"other";
+  var tBadge="";
+  if(t.trackerType){var tc=t.trackerType==="Bug"?"bug":t.trackerType==="CR"?"cr":t.trackerType==="WorkItem"?"wi":"other";tBadge='<span class="badge '+tc+'">'+ esc(t.trackerType)+'</span>';}
+  var cBadge='<span class="client-badge '+cCls+'">'+ esc(t.client||"")+'</span>';
+  var sBadge='<span class="status-pill '+g+'">'+ esc(t.status||"")+'</span>';
+  var chips="";
+  if(t.module)chips+='<span class="chip"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1"/><line x1="3" y1="4" x2="7" y2="4"/><line x1="3" y1="6" x2="6" y2="6"/></svg>'+ esc(t.module)+'</span>';
+  if(t.plant) chips+='<span class="chip"><svg viewBox="0 0 10 10"><polygon points="5,1 9,9 1,9"/></svg>'+ esc(t.plant)+'</span>';
+  if(t.dueDate)chips+='<span class="chip"><svg viewBox="0 0 10 10"><rect x="1" y="2" width="8" height="7" rx="1"/><line x1="3" y1="1" x2="3" y2="3"/><line x1="7" y1="1" x2="7" y2="3"/></svg>'+fmtD(t.dueDate)+'</span>';
+
+  var hideBtn=t.hidden
+    ? '<button class="ca-btn show" title="Restore" onclick="event.stopPropagation();unhideTask(\''+t.id+'\')"><svg viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="6.5" rx="5" ry="3.5"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/></svg></button>'
+    : '<button class="ca-btn hide" title="Hide"    onclick="event.stopPropagation();hideTask(\''+t.id+'\')"><svg viewBox="0 0 13 13" fill="none"><path d="M1.5 6.5s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z"/><line x1="2" y1="11" x2="11" y2="2" stroke-width="1.5"/></svg></button>';
+
+  function fi(l,v){var e=!v||v==="—";return '<div><div class="field-lbl">'+l+'</div><div class="field-val'+(e?' empty':'')+'">'+(e?"—":esc(String(v)))+'</div></div>';}
+
+  var doneHtml="";
+  if(t.donePct!=null){doneHtml='<div class="done-bar"><div class="done-top"><span>Progress</span><span>'+t.donePct+'%</span></div><div class="done-track"><div class="done-fill" style="width:'+t.donePct+'%"></div></div></div>';}
+
+  var relHtml="";
+  if(t.parentId||t.childIds){relHtml='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">';if(t.parentId)relHtml+='<span class="chip">&#x2B06; Parent #'+esc(t.parentId)+'</span>';if(t.childIds){var ca=t.childIds.split(",");for(var ci=0;ci<ca.length;ci++){var cid=ca[ci].trim();if(cid)relHtml+='<span class="chip">&#x2B07; Child #'+esc(cid)+'</span>';}}relHtml+="</div>";}
+
+  var noteHtml=t.note?'<div class="notes-box">'+esc(t.note).replace(/\n/g,"<br>")+'</div>':'<div class="notes-empty">No notes yet — click ✏ to add comments.</div>';
+
+  return '<div class="task-card '+cCls+(t.hidden?' hidden-card':'')+'" id="card-'+t.id+'" style="animation-delay:'+(idx%12*0.03)+'s">'+
+    '<div class="card-inner">'+
+      '<div class="card-head">'+
+        '<div class="card-badges"><span class="badge id">'+ esc(String(t.trackerId))+'</span>'+tBadge+cBadge+sBadge+'</div>'+
+        '<div class="card-actions">'+
+          '<button class="ca-btn edit" title="Edit" onclick="openEditModal(\''+t.id+'\')">'+
+            '<svg viewBox="0 0 13 13" fill="none"><path d="M2 9.5L1 12l2.5-1 7-7-1.5-1.5z"/><line x1="9" y1="2" x2="11" y2="4"/></svg>'+
+          '</button>'+hideBtn+
+          '<button class="ca-btn del" title="Remove" onclick="askDelete(\''+t.id+'\')">'+
+            '<svg viewBox="0 0 13 13" fill="none"><polyline points="1,3 12,3"/><path d="M4 3V2h5v1"/><rect x="2" y="3" width="9" height="9" rx="1"/><line x1="5" y1="6" x2="5" y2="9"/><line x1="8" y1="6" x2="8" y2="9"/></svg>'+
+          '</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card-subject">'+esc(t.subject)+'</div>'+
+      (chips?'<div class="card-chips">'+chips+'</div>':'')+
+      '<button class="card-expand-btn" onclick="toggleCard(\''+t.id+'\')">'+
+        '<span>Details</span><svg viewBox="0 0 11 7" fill="none"><polyline points="1,1 5.5,6 10,1"/></svg>'+
+      '</button>'+
+      '<div class="card-body">'+
+        '<div class="fields-grid">'+fi("Assigned To",t.assignedTo)+fi("Author",t.author)+fi("Priority",t.priority)+fi("Version",t.version)+fi("Start Date",fmtD(t.startDate))+fi("Due Date",fmtD(t.dueDate))+'</div>'+
+        doneHtml+(relHtml?'<div class="card-divider"></div>'+relHtml:"")+
+        '<div class="card-divider"></div><div class="field-lbl" style="margin-bottom:7px">Comments / Notes</div>'+noteHtml+
+        '<div class="card-ts">Added: '+fmtDT(t.addedAt)+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function toggleCard(id){var el=document.getElementById("card-"+id);if(el)el.classList.toggle("expanded");}
+
+function updateStats(){
+  var all=S.tasks.filter(function(t){return!t.hidden;});
+  var nc=0,ac=0,rc=0;
+  for(var i=0;i<all.length;i++){var g=grp(all[i].status);if(g==="new")nc++;if(g==="active")ac++;if(g==="released")rc++;}
+  document.getElementById("s-total").textContent=all.length;
+  document.getElementById("s-new").textContent=nc;
+  document.getElementById("s-active").textContent=ac;
+  document.getElementById("s-done").textContent=rc;
+}
+
+function exportExcel(){
+  if(!window.XLSX){toast("SheetJS not loaded.","error");return;}
+  if(S.tasks.length===0){toast("No tasks to export.","");return;}
+  var wb=XLSX.utils.book_new();
+  var clients=[];for(var i=0;i<S.tasks.length;i++){var cn=S.tasks[i].client||"Other";if(clients.indexOf(cn)<0)clients.push(cn);}
+  for(var xc=0;xc<clients.length;xc++){
+    var cname=clients[xc],cTasks=[],rows=[];
+    for(var xt=0;xt<S.tasks.length;xt++){if((S.tasks[xt].client||"Other")===cname)cTasks.push(S.tasks[xt]);}
+    for(var xr=0;xr<cTasks.length;xr++){var t=cTasks[xr];
+      if(cname==="Henkel")rows.push({"Sl.No":xr+1,"Tracker type":t.trackerType||"","Module":t.module||"","Tracker id":t.trackerId,"Description":t.subject||"","Plant":t.plant||"","Status":t.status||"","Comments":t.note||"","Hidden":t.hidden?"Yes":""});
+      else if(cname==="WorkItem")rows.push({"Sl.No":xr+1,"Tracker id":t.trackerId,"Description":t.subject||"","Status":t.status||"","Comments":t.note||"","Hidden":t.hidden?"Yes":""});
+      else rows.push({"Sl.No":xr+1,"Tracker type":t.trackerType||"","Tracker id":t.trackerId,"Description":t.subject||"","Status":t.status||"","Comments":t.note||"","Hidden":t.hidden?"Yes":""});
+    }
+    var ws=XLSX.utils.json_to_sheet(rows);
+    var cw=cname==="Henkel"?[6,14,18,10,60,14,35,60,6]:cname==="WorkItem"?[6,10,60,35,60,6]:[6,14,10,60,35,60,6];
+    ws["!cols"]=cw.map(function(w){return{wch:w};});
+    XLSX.utils.book_append_sheet(wb,ws,cname);
+  }
+  XLSX.writeFile(wb,"task-tracker-"+new Date().toISOString().slice(0,10)+".xlsx");
+  toast("Exported ✓","success");
+}
+function importExcel(){document.getElementById("import-input").click();}
+function handleImport(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{var wb=XLSX.read(e.target.result,{type:"array"});var imp=0,sk=0;
+      for(var si=0;si<wb.SheetNames.length;si++){var sn=wb.SheetNames[si];if(sn==="Summary")continue;
+        var rows=XLSX.utils.sheet_to_json(wb.Sheets[sn]);
+        for(var ri=0;ri<rows.length;ri++){var row=rows[ri];var tid=parseInt(row["Tracker id"]||row["Tracker ID"]||0,10);
+          if(!tid){sk++;continue;}var ex=false;for(var ei=0;ei<S.tasks.length;ei++){if(S.tasks[ei].trackerId===tid){ex=true;break;}}
+          if(ex){sk++;continue;}
+          S.tasks.push({id:uid(),client:sn,trackerId:tid,trackerType:row["Tracker type"]||"",module:row["Module"]||"",plant:row["Plant"]||"",subject:row["Description"]||"",status:row["Status"]||"",note:row["Comments"]||"",hidden:row["Hidden"]==="Yes",priority:"",assignedTo:"",author:"",startDate:"",dueDate:"",donePct:null,version:"",parentId:"",childIds:"",project:sn,addedAt:new Date().toISOString(),updatedAt:new Date().toISOString()});imp++;
+        }
+      }save();renderCards();updateStats();toast("Imported "+imp+(sk?", "+sk+" skipped":""),"success");
+    }catch(err){toast("Import failed: "+err.message,"error");}event.target.value="";
+  };reader.readAsArrayBuffer(file);
+}
+
+var _tt=null;
+function toast(msg,type){var el=document.getElementById("toast");if(!el)return;el.textContent=msg;el.className="show"+(type?" "+type:"");if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.className="";},3000);}
+function overlayClose(e,id){if(e.target.id===id){if(id==="task-overlay")closeTaskModal();if(id==="delete-overlay")closeDeleteModal();}}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeTaskModal();closeDeleteModal();}});
+
+load();renderCards();updateStats();
+</script>
 </body>
 </html>
