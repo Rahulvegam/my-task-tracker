@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Task Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<!-- ═══ ADD/EDIT MODAL ═══ -->
+<!-- ═══ ADD / EDIT MODAL ═══ -->
 <div id="task-overlay" class="overlay hidden" onclick="overlayClose(event,'task-overlay')">
   <div class="modal lg">
     <div class="modal-head">
@@ -23,41 +23,41 @@
     </div>
     <div class="modal-body">
       <div class="form-grid">
-
-        <label><span class="lbl">Tracker ID<span class="req">*</span></span>
+        <label>
+          <span class="flbl">Tracker ID<span class="req">*</span></span>
           <input id="f-id" type="number" placeholder="e.g. 68898" min="1"/>
         </label>
-
-        <label><span class="lbl">Tracker Type</span>
+        <label>
+          <span class="flbl">Tracker Type</span>
           <select id="f-tracker-type">
             <option value="">— Select —</option>
             <option>Bug</option><option>CR</option><option>WorkItem</option><option>Feature</option><option>Support</option>
           </select>
         </label>
-
         <div class="form-full">
-          <label><span class="lbl">Subject / Description<span class="req">*</span></span>
+          <label>
+            <span class="flbl">Subject / Description<span class="req">*</span></span>
             <input id="f-subject" type="text" placeholder="What is this task about?"/>
           </label>
         </div>
-
-        <label><span class="lbl">Client / Project<span class="req">*</span></span>
+        <label>
+          <span class="flbl">Client / Project<span class="req">*</span></span>
           <select id="f-client">
             <option value="">— Select —</option>
             <option>BASF</option><option>Henkel</option><option>WorkItem</option><option>Other</option>
           </select>
         </label>
-
-        <label><span class="lbl">Module</span>
+        <label>
+          <span class="flbl">Module</span>
           <input id="f-module" type="text" placeholder="e.g. Dispatch, Manufacture"/>
         </label>
-
-        <label><span class="lbl">Plant / Site</span>
+        <label>
+          <span class="flbl">Plant / Site</span>
           <input id="f-plant" type="text" placeholder="e.g. Kunpeng, Rancho"/>
         </label>
-
         <div class="form-full">
-          <label><span class="lbl">Status<span class="req">*</span></span>
+          <label>
+            <span class="flbl">Status<span class="req">*</span></span>
             <input id="f-status" type="text" placeholder="e.g. New, Released to Production…" list="status-list"/>
             <datalist id="status-list">
               <option>New</option><option>In Progress</option><option>New - Design phase</option>
@@ -67,51 +67,49 @@
             </datalist>
           </label>
         </div>
-
-        <label><span class="lbl">Priority</span>
+        <label>
+          <span class="flbl">Priority</span>
           <select id="f-priority">
             <option value="">— Select —</option>
             <option>Low</option><option>Normal</option><option>High</option><option>Urgent</option><option>Immediate</option>
           </select>
         </label>
-
-        <label><span class="lbl">Assigned To</span>
+        <label>
+          <span class="flbl">Assigned To</span>
           <input id="f-assigned" type="text" placeholder="Developer name"/>
         </label>
-
-        <label><span class="lbl">Author / Reporter</span>
+        <label>
+          <span class="flbl">Author / Reporter</span>
           <input id="f-author" type="text" placeholder="Who raised this?"/>
         </label>
-
-        <label><span class="lbl">Version / Sprint</span>
+        <label>
+          <span class="flbl">Version / Sprint</span>
           <input id="f-version" type="text" placeholder="e.g. v2.4.1"/>
         </label>
-
-        <label><span class="lbl">Start Date</span><input id="f-start" type="date"/></label>
-        <label><span class="lbl">Due Date</span><input id="f-due" type="date"/></label>
-
-        <label><span class="lbl">Done %</span>
+        <label><span class="flbl">Start Date</span><input id="f-start" type="date"/></label>
+        <label><span class="flbl">Due Date</span><input id="f-due" type="date"/></label>
+        <label>
+          <span class="flbl">Done %</span>
           <input id="f-done" type="number" min="0" max="100" placeholder="0–100"/>
         </label>
-
-        <label><span class="lbl">Parent Tracker ID</span>
+        <label>
+          <span class="flbl">Parent Tracker ID</span>
           <input id="f-parent" type="number" placeholder="e.g. 4800"/>
         </label>
-
-        <label><span class="lbl">Child / Related IDs</span>
+        <label>
+          <span class="flbl">Child / Related IDs</span>
           <input id="f-children" type="text" placeholder="Comma separated: 4822, 4823"/>
         </label>
-
         <div class="form-full">
-          <label><span class="lbl">Comments / My Notes</span>
+          <label>
+            <span class="flbl">Comments / My Notes</span>
             <textarea id="f-note" rows="3" placeholder="Post-demo notes, SOW details, client comments…"></textarea>
           </label>
         </div>
-
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeTaskModal()">Cancel</button>
-        <button class="btn-save" onclick="saveTask()">Save Task</button>
+        <button class="btn-save"   onclick="saveTask()">Save Task</button>
       </div>
     </div>
   </div>
@@ -123,17 +121,17 @@
     <div class="modal-head">
       <div>
         <h2>Remove Task</h2>
-        <div class="sub">This only removes from your local tracker</div>
+        <div class="sub">Local tracker only — Redmine is not affected</div>
       </div>
       <button class="modal-close" onclick="closeDeleteModal()">✕</button>
     </div>
     <div class="modal-body">
-      <p style="color:var(--text2);font-size:13px;margin-bottom:6px">Remove <strong id="delete-id-label"></strong>?</p>
-      <p style="color:var(--text3);font-size:12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;padding:10px;line-height:1.6">
-        ⚠ This app has <strong>zero connection to Redmine</strong>.<br>
-        Nothing will change in Redmine — only your local tracker is affected.<br>
-        Your Excel backup keeps the data safe if you export regularly.
-      </p>
+      <p style="color:var(--text2);font-size:13.5px;margin-bottom:10px">Remove <strong id="delete-id-label"></strong> from your tracker?</p>
+      <div style="background:var(--red-lt);border:1px solid var(--red-mid);border-radius:8px;padding:11px 13px;font-size:12.5px;color:#991b1b;line-height:1.7">
+        ⚠ <strong>This app has zero connection to Redmine.</strong><br>
+        Nothing changes in Redmine — only your personal tracker is updated.<br>
+        Your Excel backup keeps all data safe if you export regularly.
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
         <button class="btn-delete" onclick="confirmDelete()">Remove from Tracker</button>
@@ -142,10 +140,9 @@
   </div>
 </div>
 
-<!-- ═══ APP ═══ -->
+<!-- ═══ APP SHELL ═══ -->
 <div id="app">
 
-  <!-- SIDEBAR -->
   <aside id="sidebar">
     <div class="brand">
       <div class="brand-icon">T</div>
@@ -156,18 +153,16 @@
     </div>
 
     <div class="sb-section">
-      <button class="btn-add" onclick="openAddModal()">
-        <span class="plus">+</span> Add New Task
-      </button>
+      <button class="btn-add" onclick="openAddModal()">＋ Add New Task</button>
     </div>
 
     <div class="sb-section">
       <div class="sb-label">Client</div>
       <div class="pills" id="client-pills">
         <button class="pill active" onclick="setClient('all',this)">All</button>
-        <button class="pill" onclick="setClient('BASF',this)">BASF</button>
-        <button class="pill henkel" onclick="setClient('Henkel',this)">Henkel</button>
-        <button class="pill workitem" onclick="setClient('WorkItem',this)">WorkItem</button>
+        <button class="pill"        onclick="setClient('BASF',this)">BASF</button>
+        <button class="pill ph"     onclick="setClient('Henkel',this)">Henkel</button>
+        <button class="pill pw"     onclick="setClient('WorkItem',this)">WorkItem</button>
       </div>
     </div>
 
@@ -175,10 +170,10 @@
       <div class="sb-label">Status</div>
       <div class="pills" id="status-pills">
         <button class="pill active" onclick="setFilter('all',this)">All</button>
-        <button class="pill" onclick="setFilter('new',this)">New</button>
-        <button class="pill" onclick="setFilter('active',this)">Active</button>
-        <button class="pill" onclick="setFilter('released',this)">Released</button>
-        <button class="pill" onclick="setFilter('closed',this)">Closed</button>
+        <button class="pill"        onclick="setFilter('new',this)">New</button>
+        <button class="pill"        onclick="setFilter('active',this)">Active</button>
+        <button class="pill"        onclick="setFilter('released',this)">Released</button>
+        <button class="pill"        onclick="setFilter('closed',this)">Closed</button>
       </div>
     </div>
 
@@ -186,9 +181,9 @@
       <div class="sb-label">Type</div>
       <div class="pills" id="type-pills">
         <button class="pill active" onclick="setType('all',this)">All</button>
-        <button class="pill" onclick="setType('Bug',this)">Bug</button>
-        <button class="pill" onclick="setType('CR',this)">CR</button>
-        <button class="pill workitem" onclick="setType('WorkItem',this)">WorkItem</button>
+        <button class="pill"        onclick="setType('Bug',this)">Bug</button>
+        <button class="pill"        onclick="setType('CR',this)">CR</button>
+        <button class="pill pw"     onclick="setType('WorkItem',this)">WorkItem</button>
       </div>
     </div>
 
@@ -205,28 +200,27 @@
 
     <div class="sb-section">
       <div class="sb-label">Actions</div>
-      <button class="sb-btn" onclick="exportExcel()"><span class="sb-icon">⬇</span> Export to Excel</button>
+      <button class="sb-btn" onclick="exportExcel()">⬇ Export to Excel</button>
       <button class="sb-btn" onclick="importExcel()">
-        <span class="sb-icon">⬆</span> Import from Excel
+        ⬆ Import from Excel
         <input type="file" id="import-input" accept=".xlsx" style="display:none" onchange="handleImport(event)"/>
       </button>
     </div>
 
-    <div class="sb-section" style="padding-bottom:20px">
+    <div class="sb-section" style="padding-bottom:24px">
       <div class="sb-label">Summary</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-card"><div class="stat-num"     id="s-total">0</div><div class="stat-lbl">Total</div></div>
         <div class="stat-card"><div class="stat-num blue" id="s-new">0</div><div class="stat-lbl">New</div></div>
-        <div class="stat-card"><div class="stat-num amber" id="s-active">0</div><div class="stat-lbl">Active</div></div>
-        <div class="stat-card"><div class="stat-num green" id="s-done">0</div><div class="stat-lbl">Released</div></div>
+        <div class="stat-card"><div class="stat-num amber"id="s-active">0</div><div class="stat-lbl">Active</div></div>
+        <div class="stat-card"><div class="stat-num green"id="s-done">0</div><div class="stat-lbl">Released</div></div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main id="main">
     <div class="topbar">
-      <div class="topbar-left">
+      <div>
         <h1>My Assigned Tasks</h1>
         <div class="sub" id="main-sub">Loading…</div>
       </div>
@@ -240,7 +234,7 @@
       <button class="tab-btn active" id="tab-active" onclick="switchTab('active',this)">
         Active Tasks <span class="tab-badge" id="tab-active-count">0</span>
       </button>
-      <button class="tab-btn hidden-tab" id="tab-hidden" onclick="switchTab('hidden',this)">
+      <button class="tab-btn htab" id="tab-hidden" onclick="switchTab('hidden',this)">
         Hidden <span class="tab-badge" id="tab-hidden-count">0</span>
       </button>
     </div>
@@ -249,7 +243,7 @@
       <div id="empty-state" class="empty-state hidden">
         <div class="empty-icon">📋</div>
         <div class="empty-title">No tasks found</div>
-        <div class="empty-sub">Try a different filter or click <strong>+ Add New Task</strong></div>
+        <div class="empty-sub">Try a different filter or add a new task</div>
       </div>
       <div id="cards-container"></div>
     </div>
