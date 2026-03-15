@@ -1228,18 +1228,40 @@ window.addEventListener('message', function(e) {
 });
 
 function extSend(msg) {
-  // Must have extension ID (set by content script)
   if (!EXTENSION_ID) return Promise.resolve(null);
+
   return new Promise(function(resolve) {
+    var done = false;
+    function finish(res) {
+      if (done) return;
+      done = true;
+      resolve(res);
+    }
+
+    // Strategy 1: direct chrome.runtime.sendMessage (works if worker is awake)
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      try {
+        chrome.runtime.sendMessage(EXTENSION_ID, msg, function(res) {
+          var err = chrome.runtime.lastError;
+          if (!err && res) {
+            finish(res);
+            return;
+          }
+          // Worker asleep or not available — fall through to postMessage relay
+        });
+      } catch(e) { /* fall through */ }
+    }
+
+    // Strategy 2: postMessage relay via content.js (always works if content script loaded)
     var reqId = ++_reqCounter;
-    _pendingReqs[reqId] = resolve;
-    // Send via content script relay
+    _pendingReqs[reqId] = finish;
     window.postMessage({ type: 'RTT_TO_EXT', reqId: reqId, payload: msg }, '*');
+
     // Timeout after 8s
     setTimeout(function() {
       if (_pendingReqs[reqId]) {
         delete _pendingReqs[reqId];
-        resolve({ ok: false, error: 'Timeout — extension did not respond' });
+        finish({ ok: false, error: 'Timeout — reload the page and try again' });
       }
     }, 8000);
   });
@@ -1249,19 +1271,21 @@ async function detectExtension() {
   // Try localStorage (written by content.js on page load)
   if (!EXTENSION_ID) EXTENSION_ID = getStoredExtId();
 
-  if (!EXTENSION_ID || typeof chrome === 'undefined' || !chrome.runtime) {
+  if (!EXTENSION_ID) {
     setSyncUI('not-connected', 'Extension not detected');
     showSyncButtons(false);
     return false;
   }
 
+  // Send ping via relay
   var res = await extSend({ action: 'ping' });
+
   if (res && res.ok) {
     if (res.data && res.data.configured) {
       setSyncUI('connected', 'Connected to Redmine');
       showSyncButtons(true);
       loadCachedStatuses();
-      renderCards(); // refresh so push buttons turn green
+      renderCards();
     } else {
       setSyncUI('error', 'Extension found — open it to configure');
       showSyncButtons(false);
@@ -1269,10 +1293,9 @@ async function detectExtension() {
     return true;
   }
 
-  // ID stale — clear and show not detected
-  EXTENSION_ID = null;
-  try { localStorage.removeItem('rtt_ext_id'); } catch(e) {}
-  setSyncUI('not-connected', 'Extension not detected');
+  // Ping failed — but extension ID exists so extension IS installed
+  // It just may not be configured yet — show useful message
+  setSyncUI('error', 'Extension found — open it to configure');
   showSyncButtons(false);
   return false;
 }
