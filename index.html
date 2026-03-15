@@ -590,15 +590,30 @@ select option { background: #edf0f8; }
 .sync-link:hover { text-decoration: underline; }
 
 /* push-update modal row */
-.push-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0; border-bottom: 1px solid var(--border2);
+.push-section-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
+  color: var(--accent); margin: 14px 0 8px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--border2);
 }
-.push-row:last-child { border-bottom: none; }
-.push-field { font-size: 12px; color: var(--text2); }
-.push-field .key  { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text4); margin-bottom: 1px; }
-.push-field .val  { font-size: 12.5px; color: var(--text1); }
-.push-badge-changed { font-size: 10px; background: var(--amber-lt); color: var(--amber); border: 1px solid rgba(154,96,16,.2); padding: 1px 7px; border-radius: 99px; }
+.push-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px;
+}
+.push-grid-full {
+  display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 4px;
+}
+.push-field { display: flex; flex-direction: column; gap: 4px; }
+.push-field .key  { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text4); }
+.pf-input {
+  padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.7); font-family: var(--font); font-size: 12.5px;
+  color: var(--text1); outline: none; width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.pf-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,110,247,.1); }
+textarea.pf-input { resize: vertical; }
+.pf-range { width: 100%; accent-color: var(--accent); cursor: pointer; }
+.push-result-ok    { background: var(--green-lt); border: 1px solid rgba(31,122,82,.2); color: #155a35; }
+.push-result-error { background: #fff0f0; border: 1px solid rgba(176,40,40,.2); color: #7a1a1a; }
 
 /* install guide */
 .guide-step {
@@ -682,17 +697,96 @@ select option { background: #edf0f8; }
 
 <!-- PUSH TO REDMINE MODAL -->
 <div id="push-overlay" class="overlay hidden" onclick="overlayClose(event,'push-overlay')">
-  <div class="modal sm">
+  <div class="modal" style="max-width:580px;width:96%">
     <div class="modal-head">
-      <div><h2 id="push-title">Push to Redmine</h2><div id="push-sub" class="sub">Update this issue in Redmine</div></div>
+      <div>
+        <h2 id="push-title">Edit &amp; Sync to Redmine</h2>
+        <div id="push-sub" class="sub">Changes are pushed live to Redmine</div>
+      </div>
       <button class="modal-x" onclick="closePushModal()"><svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg></button>
     </div>
-    <div class="modal-body">
-      <div id="push-fields"></div>
-      <div class="modal-actions">
+    <div class="modal-body" style="max-height:72vh;overflow-y:auto">
+      <!-- Section: Core -->
+      <div class="push-section-label">Core Fields</div>
+      <div class="push-grid">
+        <div class="push-field">
+          <div class="key">Status</div>
+          <select id="pf-status" class="pf-input"></select>
+        </div>
+        <div class="push-field">
+          <div class="key">Done %</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="pf-done" type="range" min="0" max="100" step="10" class="pf-range"/>
+            <span id="pf-done-val" style="font-size:13px;font-weight:700;color:var(--accent);min-width:36px">0%</span>
+          </div>
+        </div>
+        <div class="push-field">
+          <div class="key">Priority</div>
+          <select id="pf-priority" class="pf-input">
+            <option value="">— unchanged —</option>
+            <option value="Low">Low</option>
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Urgent">Urgent</option>
+            <option value="Immediate">Immediate</option>
+          </select>
+        </div>
+        <div class="push-field">
+          <div class="key">Assigned To (login)</div>
+          <input id="pf-assigned" type="text" class="pf-input" placeholder="username or leave blank"/>
+        </div>
+      </div>
+
+      <!-- Section: Dates -->
+      <div class="push-section-label">Dates &amp; Version</div>
+      <div class="push-grid">
+        <div class="push-field">
+          <div class="key">Start Date</div>
+          <input id="pf-start" type="date" class="pf-input"/>
+        </div>
+        <div class="push-field">
+          <div class="key">Due Date</div>
+          <input id="pf-due" type="date" class="pf-input"/>
+        </div>
+        <div class="push-field">
+          <div class="key">Estimated Hours</div>
+          <input id="pf-hours" type="number" min="0" step="0.5" class="pf-input" placeholder="e.g. 8"/>
+        </div>
+        <div class="push-field">
+          <div class="key">Fixed Version / Sprint</div>
+          <input id="pf-version" type="text" class="pf-input" placeholder="version name"/>
+        </div>
+      </div>
+
+      <!-- Section: Subject (requires admin but we send anyway) -->
+      <div class="push-section-label">Subject &amp; Description</div>
+      <div class="push-grid-full">
+        <div class="push-field" style="grid-column:1/-1">
+          <div class="key">Subject <span style="opacity:.5;font-weight:400">(requires manager permission)</span></div>
+          <input id="pf-subject" type="text" class="pf-input" placeholder="Issue title"/>
+        </div>
+        <div class="push-field" style="grid-column:1/-1">
+          <div class="key">Description</div>
+          <textarea id="pf-desc" rows="3" class="pf-input" style="resize:vertical" placeholder="Issue description…"></textarea>
+        </div>
+      </div>
+
+      <!-- Section: Journal note -->
+      <div class="push-section-label">Journal Note</div>
+      <div class="push-grid-full">
+        <div class="push-field" style="grid-column:1/-1">
+          <div class="key">Add a comment / note to Redmine journal</div>
+          <textarea id="pf-note" rows="3" class="pf-input" style="resize:vertical" placeholder="This will appear as a journal entry in Redmine…"></textarea>
+        </div>
+      </div>
+
+      <!-- Push result feedback -->
+      <div id="push-result" style="display:none;margin-top:8px;padding:10px 12px;border-radius:9px;font-size:12.5px;line-height:1.5"></div>
+
+      <div class="modal-actions" style="margin-top:14px">
         <button class="btn-cancel" onclick="closePushModal()">Cancel</button>
-        <button class="btn-save" onclick="confirmPush()" style="background:linear-gradient(135deg,var(--green),#2a9468)">
-          Push to Redmine
+        <button id="btn-confirm-push" class="btn-save" onclick="confirmPush()" style="background:linear-gradient(135deg,var(--green),#2a9468);min-width:160px">
+          ⬆ Push to Redmine
         </button>
       </div>
     </div>
@@ -1106,12 +1200,23 @@ function handleImport(event){
 /* ════════════════════════════════
    REDMINE SYNC via Browser Extension
 ════════════════════════════════ */
-var EXTENSION_ID = null; // will be auto-detected
-var redmineStatuses = []; // cached from API
-var pushTaskId = null;    // task being pushed
+var EXTENSION_ID = null; // injected by content script
+var redmineStatuses = [];
+var pushTaskId = null;
 
-// Known extension IDs to try (update after loading extension)
-var KNOWN_IDS = [];
+// Read extension ID injected by content.js via localStorage
+function getStoredExtId() {
+  try { return localStorage.getItem('rtt_ext_id') || null; } catch(e) { return null; }
+}
+
+// Listen for content script postMessage (fires before localStorage settles)
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'REDMINE_BRIDGE_PRESENT' && e.data.extId) {
+    EXTENSION_ID = e.data.extId;
+    localStorage.setItem('rtt_ext_id', EXTENSION_ID);
+    detectExtension();
+  }
+});
 
 async function extSend(msg) {
   // Try externally_connectable (from web page to extension)
@@ -1129,31 +1234,30 @@ async function extSend(msg) {
 }
 
 async function detectExtension() {
-  // chrome.runtime is only available if the extension declared this origin
-  if (typeof chrome === 'undefined' || !chrome.runtime) {
-    setSyncUI('not-connected', 'Install the extension to sync');
+  // Try localStorage (written by content.js on page load)
+  if (!EXTENSION_ID) EXTENSION_ID = getStoredExtId();
+
+  if (!EXTENSION_ID || typeof chrome === 'undefined' || !chrome.runtime) {
+    setSyncUI('not-connected', 'Extension not detected');
+    showSyncButtons(false);
     return false;
   }
-  // Try stored ID first
-  try {
-    var stored = localStorage.getItem('rtt_ext_id');
-    if (stored) { EXTENSION_ID = stored; }
-  } catch(e) {}
 
-  if (EXTENSION_ID) {
-    var res = await extSend({ action: 'ping' });
-    if (res && res.ok) {
-      if (res.data.configured) {
-        setSyncUI('connected', 'Connected to Redmine');
-        showSyncButtons(true);
-        loadCachedStatuses();
-      } else {
-        setSyncUI('error', 'Extension found — needs config');
-        showSyncButtons(false);
-      }
-      return true;
+  var res = await extSend({ action: 'ping' });
+  if (res && res.ok) {
+    if (res.data && res.data.configured) {
+      setSyncUI('connected', 'Connected to Redmine');
+      showSyncButtons(true);
+    } else {
+      setSyncUI('error', 'Extension found — open it to configure');
+      showSyncButtons(false);
     }
+    return true;
   }
+
+  // ID stale — clear and show not detected
+  EXTENSION_ID = null;
+  try { localStorage.removeItem('rtt_ext_id'); } catch(e) {}
   setSyncUI('not-connected', 'Extension not detected');
   showSyncButtons(false);
   return false;
@@ -1193,16 +1297,18 @@ async function fetchFromRedmine() {
     for (var i = 0; i < S.tasks.length; i++) {
       if (S.tasks[i].trackerId === issue.id) { existing = S.tasks[i]; break; }
     }
-    var mapped = mapRedmineIssue(issue);
+    var mapped = mapRedmineIssue(issue, issues); // pass all issues for child detection
     if (existing) {
-      // Update fields from Redmine but preserve local notes/hidden
-      var localNote = existing.note;
-      Object.assign(existing, mapped, { note: existing.note || mapped.note, hidden: existing.hidden });
+      // Update all Redmine fields but preserve local note overrides and hidden state
+      Object.assign(existing, mapped, {
+        note:   existing.note || mapped.note,
+        hidden: existing.hidden
+      });
       existing.syncedAt = new Date().toISOString();
       updated++;
     } else {
       mapped.id = uid();
-      mapped.addedAt = new Date().toISOString();
+      mapped.addedAt  = new Date().toISOString();
       mapped.updatedAt = mapped.addedAt;
       mapped.syncedAt  = mapped.addedAt;
       mapped.hidden = false;
@@ -1220,29 +1326,53 @@ async function fetchFromRedmine() {
   toast('Pulled ' + issues.length + ' issues — ' + added + ' new, ' + updated + ' updated', 'success');
 }
 
-function mapRedmineIssue(issue) {
-  // Map Redmine API fields → our task schema
+function mapRedmineIssue(issue, allIssues) {
   var client = guessClient(issue);
+  var childIds = [];
+  if (issue.children) {
+    issue.children.forEach(function(c) { childIds.push(String(c.id)); });
+  }
+  if (allIssues) {
+    allIssues.forEach(function(i) {
+      if (i.parent && i.parent.id === issue.id) {
+        var s = String(i.id);
+        if (childIds.indexOf(s) < 0) childIds.push(s);
+      }
+    });
+  }
+  var relatedIds = [];
+  if (issue.relations) {
+    issue.relations.forEach(function(r) {
+      var rid = String(r.issue_id === issue.id ? r.issue_to_id : r.issue_id);
+      relatedIds.push(r.relation_type + ':' + rid);
+    });
+  }
   return {
-    trackerId:   issue.id,
-    subject:     issue.subject || '',
-    status:      (issue.status && issue.status.name) || '',
-    trackerType: (issue.tracker && issue.tracker.name) || '',
-    client:      client,
-    project:     (issue.project && issue.project.name) || '',
-    module:      getCustomField(issue, 'Module') || getCategoryName(issue) || '',
-    plant:       getCustomField(issue, 'Plant') || getCustomField(issue, 'Site') || '',
-    priority:    (issue.priority && issue.priority.name) || '',
-    assignedTo:  (issue.assigned_to && issue.assigned_to.name) || '',
-    author:      (issue.author && issue.author.name) || '',
-    startDate:   issue.start_date || '',
-    dueDate:     issue.due_date || '',
-    donePct:     issue.done_ratio != null ? issue.done_ratio : null,
-    version:     (issue.fixed_version && issue.fixed_version.name) || '',
-    parentId:    (issue.parent && issue.parent.id) ? String(issue.parent.id) : '',
-    childIds:    '',
-    note:        issue.description || '',
-    redmineStatusId: issue.status && issue.status.id,
+    trackerId:       issue.id,
+    subject:         issue.subject || '',
+    status:          (issue.status        && issue.status.name)        || '',
+    trackerType:     (issue.tracker       && issue.tracker.name)       || '',
+    client:          client,
+    project:         (issue.project       && issue.project.name)       || '',
+    module:          getCustomField(issue, 'Module') || getCategoryName(issue) || '',
+    plant:           getCustomField(issue, 'Plant')  || getCustomField(issue, 'Site') || '',
+    priority:        (issue.priority      && issue.priority.name)      || '',
+    assignedTo:      (issue.assigned_to   && issue.assigned_to.name)   || '',
+    author:          (issue.author        && issue.author.name)        || '',
+    startDate:       issue.start_date     || '',
+    dueDate:         issue.due_date       || '',
+    donePct:         issue.done_ratio != null ? issue.done_ratio : 0,
+    estimatedHours:  issue.estimated_hours || '',
+    spentHours:      issue.spent_hours    || '',
+    version:         (issue.fixed_version && issue.fixed_version.name) || '',
+    parentId:        (issue.parent && issue.parent.id) ? String(issue.parent.id) : '',
+    childIds:        childIds.join(', '),
+    relatedIds:      relatedIds.join(', '),
+    description:     issue.description   || '',
+    note:            issue.description   || '',
+    createdOn:       issue.created_on    || '',
+    updatedOn:       issue.updated_on    || '',
+    redmineStatusId:  issue.status  && issue.status.id,
     redmineProjectId: issue.project && issue.project.id
   };
 }
@@ -1276,43 +1406,58 @@ function openPushModal(taskId) {
   var t = findTask(taskId);
   if (!t) return;
   pushTaskId = taskId;
-  document.getElementById('push-title').textContent = 'Push #' + t.trackerId + ' to Redmine';
-  document.getElementById('push-sub').textContent = t.subject.slice(0, 60) + (t.subject.length > 60 ? '…' : '');
 
-  var statusOptions = redmineStatuses.length
-    ? redmineStatuses.map(function(s) {
-        return '<option value="' + s.id + '"' + (t.redmineStatusId === s.id ? ' selected' : '') + '>' + esc(s.name) + '</option>';
-      }).join('')
-    : '<option value="">— Load statuses first —</option>';
+  document.getElementById('push-title').textContent = 'Edit & Sync  #' + t.trackerId;
+  document.getElementById('push-sub').textContent   = t.subject.slice(0, 70) + (t.subject.length > 70 ? '…' : '');
 
-  var html = [
-    '<div class="push-row">',
-    '  <div class="push-field"><div class="key">Status</div>',
-    '  <select id="push-status" style="margin-top:4px;width:100%;padding:6px 9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;outline:none;color:var(--text1)">',
-    statusOptions,
-    '  </select></div>',
-    '</div>',
-    '<div class="push-row">',
-    '  <div class="push-field" style="width:100%"><div class="key">Done % (0–100)</div>',
-    '  <input id="push-done" type="number" min="0" max="100" value="' + (t.donePct || 0) + '" style="margin-top:4px;width:100%;padding:6px 9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;outline:none;color:var(--text1)"/>',
-    '  </div>',
-    '</div>',
-    '<div class="push-row">',
-    '  <div class="push-field" style="width:100%"><div class="key">Add a note / journal entry (optional)</div>',
-    '  <textarea id="push-note" rows="3" placeholder="Comment to add in Redmine journal…" style="margin-top:4px;width:100%;padding:7px 9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;outline:none;resize:vertical;color:var(--text1)"></textarea>',
-    '  </div>',
-    '</div>',
-    '<div style="background:var(--amber-lt);border:1px solid rgba(154,96,16,.18);border-radius:8px;padding:9px 11px;font-size:11.5px;color:var(--amber);margin-top:4px">',
-    '  ⚡ This will immediately update issue #' + t.trackerId + ' in Redmine. This cannot be undone.',
-    '</div>'
-  ].join('');
-  document.getElementById('push-fields').innerHTML = html;
-  document.getElementById('push-overlay').classList.remove('hidden');
-  // Load statuses if missing
-  if (!redmineStatuses.length) loadCachedStatuses().then(function() {
-    // Re-render if now loaded
-    openPushModal(taskId);
+  // Populate status dropdown
+  var sel = document.getElementById('pf-status');
+  sel.innerHTML = '<option value="">— unchanged —</option>';
+  if (redmineStatuses.length) {
+    redmineStatuses.forEach(function(s) {
+      var o = document.createElement('option');
+      o.value = s.id;
+      o.textContent = s.name;
+      if (t.redmineStatusId === s.id) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  // Done % slider
+  var done = parseInt(t.donePct) || 0;
+  var slider = document.getElementById('pf-done');
+  var doneVal = document.getElementById('pf-done-val');
+  slider.value = done;
+  doneVal.textContent = done + '%';
+  slider.oninput = function() { doneVal.textContent = this.value + '%'; };
+
+  // Priority
+  var pri = document.getElementById('pf-priority');
+  Array.from(pri.options).forEach(function(o) {
+    o.selected = o.value === (t.priority || '');
   });
+
+  // Other fields
+  document.getElementById('pf-assigned').value = t.assignedTo || '';
+  document.getElementById('pf-start').value    = t.startDate  || '';
+  document.getElementById('pf-due').value      = t.dueDate    || '';
+  document.getElementById('pf-hours').value    = t.estimatedHours || '';
+  document.getElementById('pf-version').value  = t.version    || '';
+  document.getElementById('pf-subject').value  = t.subject    || '';
+  document.getElementById('pf-desc').value     = t.description || t.note || '';
+  document.getElementById('pf-note').value     = '';
+
+  // Reset result
+  var res = document.getElementById('push-result');
+  res.style.display = 'none'; res.className = ''; res.innerHTML = '';
+
+  document.getElementById('btn-confirm-push').disabled = false;
+  document.getElementById('push-overlay').classList.remove('hidden');
+
+  // Load statuses if needed
+  if (!redmineStatuses.length) {
+    loadCachedStatuses().then(function() { openPushModal(taskId); });
+  }
 }
 
 function closePushModal() {
@@ -1323,33 +1468,93 @@ function closePushModal() {
 async function confirmPush() {
   var t = findTask(pushTaskId);
   if (!t) return;
-  var statusEl = document.getElementById('push-status');
-  var doneEl   = document.getElementById('push-done');
-  var noteEl   = document.getElementById('push-note');
+
+  var btn = document.getElementById('btn-confirm-push');
+  btn.disabled = true;
+  btn.textContent = '⏳ Pushing…';
+
+  var resultEl = document.getElementById('push-result');
+  resultEl.style.display = 'none';
+
+  // Build fields object — only include changed/non-empty values
   var fields = {};
-  if (statusEl && statusEl.value) fields.status_id = parseInt(statusEl.value, 10);
-  if (doneEl)  fields.done_ratio = parseInt(doneEl.value, 10) || 0;
-  var noteVal = (noteEl && noteEl.value.trim()) || '';
+
+  var statusVal = document.getElementById('pf-status').value;
+  if (statusVal) fields.status_id = parseInt(statusVal, 10);
+
+  var doneVal = parseInt(document.getElementById('pf-done').value, 10);
+  if (!isNaN(doneVal)) fields.done_ratio = doneVal;
+
+  var priVal = document.getElementById('pf-priority').value;
+  if (priVal) fields.priority_id = priVal; // will be resolved server-side by name
+
+  var startVal = document.getElementById('pf-start').value;
+  if (startVal) fields.start_date = startVal;
+
+  var dueVal = document.getElementById('pf-due').value;
+  if (dueVal) fields.due_date = dueVal;
+
+  var hoursVal = document.getElementById('pf-hours').value;
+  if (hoursVal !== '') fields.estimated_hours = parseFloat(hoursVal);
+
+  var subjectVal = document.getElementById('pf-subject').value.trim();
+  if (subjectVal && subjectVal !== t.subject) fields.subject = subjectVal;
+
+  var descVal = document.getElementById('pf-desc').value.trim();
+  if (descVal !== (t.description || t.note || '')) fields.description = descVal;
+
+  var noteVal = document.getElementById('pf-note').value.trim();
   if (noteVal) fields.notes = noteVal;
-  if (!Object.keys(fields).length) { toast('Nothing to push.', ''); return; }
+
+  if (!Object.keys(fields).length) {
+    btn.disabled = false; btn.textContent = '⬆ Push to Redmine';
+    showPushResult('error', '⚠ Nothing changed', 'Edit at least one field before pushing.');
+    return;
+  }
+
   setSyncUI('syncing', 'Pushing to Redmine…');
   var res = await extSend({ action: 'updateIssue', id: t.trackerId, fields: fields });
+
   if (res && res.ok) {
-    // Update locally too
+    // Update local task to match
     if (fields.status_id) {
       var st = redmineStatuses.find(function(s) { return s.id === fields.status_id; });
       if (st) { t.status = st.name; t.redmineStatusId = st.id; }
     }
-    if (fields.done_ratio != null) t.donePct = fields.done_ratio;
+    if (fields.done_ratio != null)    t.donePct          = fields.done_ratio;
+    if (fields.start_date)            t.startDate        = fields.start_date;
+    if (fields.due_date)              t.dueDate          = fields.due_date;
+    if (fields.estimated_hours)       t.estimatedHours   = fields.estimated_hours;
+    if (fields.subject)               t.subject          = fields.subject;
+    if (fields.description)           { t.description    = fields.description; t.note = fields.description; }
+    if (fields.priority_id)           t.priority         = fields.priority_id;
     t.updatedAt = new Date().toISOString();
+
     save(); renderCards(); updateStats();
     setSyncUI('connected', 'Push successful ✓');
     toast('Issue #' + t.trackerId + ' updated in Redmine ✓', 'success');
-    closePushModal();
+
+    // Show success in modal then auto-close
+    showPushResult('ok', '✅ Pushed successfully!',
+      'Fields updated: ' + Object.keys(fields).filter(function(k) { return k !== 'notes'; }).join(', ') +
+      (fields.notes ? ' + journal note added' : ''));
+    btn.textContent = '✓ Done';
+    setTimeout(closePushModal, 1800);
   } else {
     setSyncUI('error', 'Push failed');
-    toast('Push failed: ' + (res && res.error ? res.error : 'No response from extension'), 'error');
+    var errMsg = (res && res.error) ? res.error : 'No response from extension — is it installed and connected?';
+    showPushResult('error', '❌ Push Failed', errMsg);
+    btn.disabled = false;
+    btn.textContent = '⬆ Push to Redmine';
+    toast('Push failed: ' + errMsg, 'error');
   }
+}
+
+function showPushResult(type, title, detail) {
+  var el = document.getElementById('push-result');
+  el.className = 'push-result-' + type;
+  el.innerHTML = '<strong>' + title + '</strong>' + (detail ? '<div style="margin-top:3px;font-size:11.5px;opacity:.85">' + detail + '</div>' : '');
+  el.style.display = 'block';
 }
 
 function showInstallGuide() {
