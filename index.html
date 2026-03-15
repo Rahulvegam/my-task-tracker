@@ -1121,11 +1121,9 @@ function buildCard(t,idx){
           '<button class="ca-btn edit" title="Edit" onclick="openEditModal(\''+t.id+'\')">'+
             '<svg viewBox="0 0 13 13" fill="none"><path d="M2 9.5L1 12l2.5-1 7-7-1.5-1.5z"/><line x1="9" y1="2" x2="11" y2="4"/></svg>'+
           '</button>'+hideBtn+
-          (EXTENSION_ID ?
-            '<button class="ca-btn push" title="Push to Redmine" onclick="event.stopPropagation();openPushModal(\''+t.id+'\')" style="color:var(--green)">'+
-              '<svg viewBox="0 0 13 13" fill="none"><polyline points="6.5,9 6.5,1"/><polyline points="3.5,4 6.5,1 9.5,4"/><path d="M2,10 Q2,12 4,12 L9,12 Q11,12 11,10"/></svg>'+
-            '</button>'
-          : '')+
+          '<button class="ca-btn push" title="'+(EXTENSION_ID?'Push to Redmine':'Connect extension to push')+'" onclick="event.stopPropagation();'+(EXTENSION_ID?'openPushModal(\''+t.id+'\')':'showInstallGuide()')+'" style="color:'+(EXTENSION_ID?'var(--green)':'var(--text4)')+'">'+
+            '<svg viewBox="0 0 13 13" fill="none"><polyline points="6.5,9 6.5,1"/><polyline points="3.5,4 6.5,1 9.5,4"/><path d="M2,10 Q2,12 4,12 L9,12 Q11,12 11,10"/></svg>'+
+          '</button>'+
           '<button class="ca-btn del" title="Remove" onclick="askDelete(\''+t.id+'\')">'+
             '<svg viewBox="0 0 13 13" fill="none"><polyline points="1,3 12,3"/><path d="M4 3V2h5v1"/><rect x="2" y="3" width="9" height="9" rx="1"/><line x1="5" y1="6" x2="5" y2="9"/><line x1="8" y1="6" x2="8" y2="9"/></svg>'+
           '</button>'+
@@ -1209,28 +1207,42 @@ function getStoredExtId() {
   try { return localStorage.getItem('rtt_ext_id') || null; } catch(e) { return null; }
 }
 
-// Listen for content script postMessage (fires before localStorage settles)
+// ── Message relay via content script (avoids "Receiving end does not exist") ──
+// The content script is always alive and forwards messages to the background.
+var _pendingReqs = {};
+var _reqCounter  = 0;
+
 window.addEventListener('message', function(e) {
+  // Extension announced itself
   if (e.data && e.data.type === 'REDMINE_BRIDGE_PRESENT' && e.data.extId) {
     EXTENSION_ID = e.data.extId;
-    localStorage.setItem('rtt_ext_id', EXTENSION_ID);
+    try { localStorage.setItem('rtt_ext_id', EXTENSION_ID); } catch(x) {}
     detectExtension();
+    return;
+  }
+  // Response from background via content script relay
+  if (e.data && e.data.type === 'RTT_FROM_EXT') {
+    var cb = _pendingReqs[e.data.reqId];
+    if (cb) { delete _pendingReqs[e.data.reqId]; cb(e.data.response); }
   }
 });
 
-async function extSend(msg) {
-  // Try externally_connectable (from web page to extension)
-  if (EXTENSION_ID) {
-    return new Promise(function(resolve) {
-      try {
-        chrome.runtime.sendMessage(EXTENSION_ID, msg, function(res) {
-          if (chrome.runtime.lastError) { EXTENSION_ID = null; resolve(null); }
-          else resolve(res);
-        });
-      } catch(e) { resolve(null); }
-    });
-  }
-  return null;
+function extSend(msg) {
+  // Must have extension ID (set by content script)
+  if (!EXTENSION_ID) return Promise.resolve(null);
+  return new Promise(function(resolve) {
+    var reqId = ++_reqCounter;
+    _pendingReqs[reqId] = resolve;
+    // Send via content script relay
+    window.postMessage({ type: 'RTT_TO_EXT', reqId: reqId, payload: msg }, '*');
+    // Timeout after 8s
+    setTimeout(function() {
+      if (_pendingReqs[reqId]) {
+        delete _pendingReqs[reqId];
+        resolve({ ok: false, error: 'Timeout — extension did not respond' });
+      }
+    }, 8000);
+  });
 }
 
 async function detectExtension() {
@@ -1248,6 +1260,8 @@ async function detectExtension() {
     if (res.data && res.data.configured) {
       setSyncUI('connected', 'Connected to Redmine');
       showSyncButtons(true);
+      loadCachedStatuses();
+      renderCards(); // refresh so push buttons turn green
     } else {
       setSyncUI('error', 'Extension found — open it to configure');
       showSyncButtons(false);
